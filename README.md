@@ -69,7 +69,7 @@ provider "aws" {
 }
 
 module "next_serverless" {
-  source  = "emyriounis/nextjs-serverless/aws"
+  source = "emyriounis/nextjs-serverless/aws"
 
   deployment_name = "nextjs-serverless" #needs to be unique since it will create s3 buckets
   region          = "eu-central-1" #customize your region
