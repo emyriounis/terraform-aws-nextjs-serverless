@@ -1,0 +1,22 @@
+{
+  "name": "ns-build",
+  "version": "0.3.0",
+  "description": "Bash script to build serverless component for deploying to AWS using Terraform",
+  "bin": {
+    "ns-build": "./bin/ns-build.sh"
+  },
+  "license": "Apache-2.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://gitlab.com/emyriounis/nextjs-serverless.git"
+  },
+  "author": "Eleftherios Myriounis",
+  "bugs": {
+    "url": "https://gitlab.com/emyriounis/nextjs-serverless/issues"
+  },
+  "homepage": "https://gitlab.com/emyriounis/nextjs-serverless#readme"
+}

@@ -1,0 +1,32 @@
+{
+  "name": "ns-img-opt",
+  "version": "0.3.0",
+  "description": "Image Optimization Lambda",
+  "main": "index.js",
+  "scripts": {
+    "build": "tsc",
+    "prepare-lambda": "bash scripts/prepare-lambda.sh"
+  },
+  "license": "Apache-2.0",
+  "devDependencies": {
+    "@types/node": "^20.8.4",
+    "ts-node": "^10.9.1",
+    "typescript": "^5.2.2"
+  },
+  "dependencies": {
+    "@aws-sdk/client-s3": "^3.433.0",
+    "sharp": "^0.32.6"
+  },
+  "files": [
+    "source.zip"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://gitlab.com/emyriounis/nextjs-serverless.git"
+  },
+  "author": "Eleftherios Myriounis",
+  "bugs": {
+    "url": "https://gitlab.com/emyriounis/nextjs-serverless/issues"
+  },
+  "homepage": "https://gitlab.com/emyriounis/nextjs-serverless#readme"
+}
