@@ -59,7 +59,7 @@ Please check our [testing guidelines](https://github.com/emyriounis/terraform-aw
 1. Switch to the local source
 ```diff
 module "tf_next" {
-- source  = "emyriounis/terraform-aws-nextjs-serverless/aws"
+- source  = "emyriounis/nextjs-serverless/aws"
 - version = "0.3.0"
 + source = "../../../"
   ...

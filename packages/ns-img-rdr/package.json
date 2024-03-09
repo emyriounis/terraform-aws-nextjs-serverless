@@ -1,5 +1,5 @@
 {
-  "name": "image-redirection",
+  "name": "ns-img-rdr",
   "version": "0.3.0",
   "description": "Image Redirection Lambda",
   "main": "index.js",

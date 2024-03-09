@@ -1,4 +1,4 @@
-import type { NextPage } from 'next'
+import type { NextPage, NextPageContext } from 'next'
 import { Dispatch, SetStateAction, createContext, useState } from 'react'
 import SSR from './SSR'
 
@@ -19,13 +19,15 @@ const Home: NextPage = (props: any) => {
 }
 
 // This gets called on every request
-export async function getServerSideProps() {
+export async function getServerSideProps(context: NextPageContext) {
+  console.log({context});
+
   const baseUrl = `{{DISTRIBUTION_URL}}`
 
   // Fetch data from external API
   const res = await fetch(baseUrl + '/api/hello')
   const date = new Date()
-  console.log(date);
+  console.log(date)
   const data = { ...(await res.json()), date: date.toISOString() }
 
   // Pass data to the page via props
