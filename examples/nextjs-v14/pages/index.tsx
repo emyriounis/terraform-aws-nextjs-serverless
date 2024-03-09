@@ -42,7 +42,7 @@ const Home: NextPage = () => {
           </a>
 
           <a
-            href='https://registry.terraform.io/modules/emyriounis/nextjs-serverless'
+            href='https://registry.terraform.io/modules/emyriounis/terraform-aws-nextjs-serverless'
             className={styles.card}
           >
             <h2>Deploy &rarr;</h2>

@@ -52,7 +52,7 @@ module.exports = nextConfig
 
 ### Create Terraform deployment
 
-Check it on [Terraform Registry](https://registry.terraform.io/modules/emyriounis/nextjs-serverless) for more details.
+Check it on [Terraform Registry](https://registry.terraform.io/modules/emyriounis/terraform-aws-nextjs-serverless) for more details.
 
 _Ensure that the deployment name is unique since its used for creating s3 buckets._
 
@@ -69,7 +69,7 @@ provider "aws" {
 }
 
 module "next_serverless" {
-  source  = "emyriounis/nextjs-serverless/aws"
+  source  = "emyriounis/terraform-aws-nextjs-serverless/aws"
 
   deployment_name = "nextjs-serverless" #needs to be unique since it will create s3 buckets
   region          = "eu-central-1" #customize your region
@@ -95,18 +95,18 @@ terraform apply
 ## Architecture
 
 ### Module 
-![Module ](https://github.com/emyriounis/nextjs-serverless/blob/main/visuals/module.webp?raw=true)
+![Module ](https://github.com/emyriounis/terraform-aws-nextjs-serverless/blob/main/visuals/module.webp?raw=true)
 
 ### Distribution 
-![Distribution ](https://github.com/emyriounis/nextjs-serverless/blob/main/visuals/distribution.webp?raw=true)
+![Distribution ](https://github.com/emyriounis/terraform-aws-nextjs-serverless/blob/main/visuals/distribution.webp?raw=true)
 
 ### Cache 
-![Cache ](https://github.com/emyriounis/nextjs-serverless/blob/main/visuals/cache.webp?raw=true)
+![Cache ](https://github.com/emyriounis/terraform-aws-nextjs-serverless/blob/main/visuals/cache.webp?raw=true)
 
 
 ## Examples
 
-* [Next.js v13](https://github.com/emyriounis/nextjs-serverless/tree/main/examples/nextjs-v13)
+* [Next.js v13](https://github.com/emyriounis/terraform-aws-nextjs-serverless/tree/main/examples/nextjs-v13)
   Complete example with SSR, API, static pages, image optimization & custom domain
 
 
@@ -123,9 +123,9 @@ terraform apply
 
 Feel free to improve this module.
 <br>
-Our [contributing guidelines](https://github.com/emyriounis/nextjs-serverless/tree/main/CONTRIBUTING.md) will help you get started.
+Our [contributing guidelines](https://github.com/emyriounis/terraform-aws-nextjs-serverless/tree/main/CONTRIBUTING.md) will help you get started.
 
 
 ## License
-Apache-2.0 - see [LICENSE](https://github.com/emyriounis/nextjs-serverless/tree/main/LICENSE) for details.\
+Apache-2.0 - see [LICENSE](https://github.com/emyriounis/terraform-aws-nextjs-serverless/tree/main/LICENSE) for details.\
 Disclaimer: This module was originally developed by [me](https://github.com/emyriounis) during my time at Nexode Consulting GmbH.

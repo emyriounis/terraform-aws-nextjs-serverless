@@ -22,11 +22,11 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://gitlab.com/emyriounis/nextjs-serverless.git"
+    "url": "git+https://gitlab.com/emyriounis/terraform-aws-nextjs-serverless.git"
   },
   "author": "Eleftherios Myriounis",
   "bugs": {
-    "url": "https://gitlab.com/emyriounis/nextjs-serverless/issues"
+    "url": "https://gitlab.com/emyriounis/terraform-aws-nextjs-serverless/issues"
   },
-  "homepage": "https://gitlab.com/emyriounis/nextjs-serverless#readme"
+  "homepage": "https://gitlab.com/emyriounis/terraform-aws-nextjs-serverless#readme"
 }

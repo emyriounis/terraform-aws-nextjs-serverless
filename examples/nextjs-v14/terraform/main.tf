@@ -1,6 +1,6 @@
 module "next_serverless" {
   source = "../../../"
-  # source  = "emyriounis/nextjs-serverless/aws"
+  # source  = "emyriounis/terraform-aws-nextjs-serverless/aws"
   # version = "0.3.0"
 
   deployment_name = var.deployment_name
