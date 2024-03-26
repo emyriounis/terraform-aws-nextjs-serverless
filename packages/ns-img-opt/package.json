@@ -1,6 +1,6 @@
 {
   "name": "ns-img-opt",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "Image Optimization Lambda",
   "main": "index.js",
   "scripts": {
@@ -22,11 +22,11 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://gitlab.com/emyriounis/terraform-aws-nextjs-serverless.git"
+    "url": "git+https://github.com/emyriounis/terraform-aws-nextjs-serverless.git"
   },
   "author": "Eleftherios Myriounis",
   "bugs": {
-    "url": "https://gitlab.com/emyriounis/terraform-aws-nextjs-serverless/issues"
+    "url": "https://github.com/emyriounis/terraform-aws-nextjs-serverless/issues"
   },
-  "homepage": "https://gitlab.com/emyriounis/terraform-aws-nextjs-serverless#readme"
+  "homepage": "https://github.com/emyriounis/terraform-aws-nextjs-serverless#readme"
 }

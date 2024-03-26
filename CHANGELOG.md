@@ -5,6 +5,11 @@ All notable changes to this project will be documented in this file.
 <!-- ## [Unreleased] -->
 
 
+## [v0.3.1] - 2024-03-26
+
+* Fix git urls
+
+
 ## [v0.3.0] - 2024-03-09
 
 * Set up forked repo, module & packages
