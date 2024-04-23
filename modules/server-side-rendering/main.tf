@@ -49,7 +49,7 @@ module "next_lambda" {
   source  = "terraform-aws-modules/lambda/aws"
   version = "6.5.0"
 
-  function_name = "${var.deployment_name}-server-lambda"
+  function_name = "${var.deployment_name}-ssr"
   description   = "${var.deployment_name} Server"
 
   lambda_at_edge               = false

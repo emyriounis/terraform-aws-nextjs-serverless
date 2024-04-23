@@ -32,6 +32,10 @@ module "server-side-rendering" {
 module "image-optimization" {
   source = "./modules/image-optimization"
 
+  providers = {
+    aws.global_region = aws.global_region
+  }
+
   deployment_name = var.deployment_name
   base_dir        = var.base_dir
 
