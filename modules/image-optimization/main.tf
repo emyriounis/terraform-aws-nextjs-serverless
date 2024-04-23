@@ -1,8 +1,3 @@
-provider "aws" {
-  alias  = "global_region"
-  region = "us-east-1"
-}
-
 ####################################
 ######## image_optimization ########
 ####################################

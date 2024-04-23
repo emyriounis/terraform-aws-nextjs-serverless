@@ -1,7 +1,11 @@
 module "next_serverless" {
   # source = "../../../"
   source  = "emyriounis/nextjs-serverless/aws"
-  version = "0.3.1"
+  version = "0.3.2"
+
+  providers = {
+    aws.global_region = aws.global_region
+  }
 
   deployment_name = var.deployment_name
   region          = var.region

@@ -11,8 +11,8 @@ module "next_serverless" {
   source = "emyriounis/nextjs-serverless/aws"
 
   deployment_name = "tm-nextjs-serverless" #needs to be unique since it will create s3 buckets
-  region          = "eu-central-1" #customize your region
-  base_dir        = "./" #The base directory of the next.js app
+  region          = "eu-central-1"         #customize your region
+  base_dir        = "./"                   #The base directory of the next.js app
 
   next_lambda_runtime        = "nodejs20.x"
   image_optimization_runtime = "nodejs20.x"
