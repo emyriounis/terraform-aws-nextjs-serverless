@@ -41,6 +41,6 @@ const main = serverless(nextServer.getRequestHandler(), {
 })
 
 export const handler = (event: any, context: any) =>
-  event.rawPath.includes('/_next/data/')
+  !process.env.DEFAULT_SS_PROPS_HANDLER && event.rawPath.includes('/_next/data/')
     ? getProps(event, context)
     : main(event, context)

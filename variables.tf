@@ -122,3 +122,9 @@ variable "cloudfront_cache_min_ttl" {
   type        = number
   default     = 0
 }
+
+variable "use_default_server_side_props_handler" {
+  description = "Boolean to enabled usage of the default server side props handler, instead of the our custom one"
+  type        = bool
+  default     = false
+}
