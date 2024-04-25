@@ -5,7 +5,10 @@
 locals {
   lambda_source_object_s3_key = "source-${filemd5("${var.base_dir}deployments/source.zip")}.zip"
   lambda_layer_object_s3_key  = "layer-${filemd5("${var.base_dir}deployments/layer.zip")}.zip"
-  lambda_default_env_vars     = var.use_default_server_side_props_handler ? { DEFAULT_SS_PROPS_HANDLER = true } : {}
+  lambda_default_env_vars = merge(
+    var.use_default_server_side_props_handler ? { DEFAULT_SS_PROPS_HANDLER = true } : {},
+    var.show_debug_logs ? { SHOW_DEBUG_LOGS = true } : {}
+  )
 }
 
 module "next_lambda_zips_bucket" {

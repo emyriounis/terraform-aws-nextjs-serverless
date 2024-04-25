@@ -1,11 +1,11 @@
 {
   "name": "ns-img-opt",
-  "version": "0.3.3",
+  "version": "0.3.4",
   "description": "Image Optimization Lambda",
   "main": "index.js",
   "scripts": {
     "build": "tsc",
-    "prepare-lambda": "bash scripts/prepare-lambda.sh"
+    "pre-publish": "bash scripts/pre-publish.sh"
   },
   "license": "Apache-2.0",
   "devDependencies": {

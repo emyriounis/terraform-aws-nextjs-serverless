@@ -37,3 +37,7 @@ variable "api_gateway_log_format" {
 variable "use_default_server_side_props_handler" {
   type = bool
 }
+
+variable "show_debug_logs" {
+  type = bool
+}

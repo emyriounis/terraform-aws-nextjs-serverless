@@ -128,3 +128,9 @@ variable "use_default_server_side_props_handler" {
   type        = bool
   default     = false
 }
+
+variable "show_debug_logs" {
+  description = "Boolean to enabled debug logs"
+  type        = bool
+  default     = false
+}
