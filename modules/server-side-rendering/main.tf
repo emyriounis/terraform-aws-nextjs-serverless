@@ -5,6 +5,7 @@
 locals {
   lambda_source_object_s3_key = "source-${filemd5("${var.base_dir}deployments/source.zip")}.zip"
   lambda_layer_object_s3_key  = "layer-${filemd5("${var.base_dir}deployments/layer.zip")}.zip"
+  lambda_default_env_vars     = var.use_default_server_side_props_handler ? [{ DEFAULT_SS_PROPS_HANDLER = true }] : []
 }
 
 module "next_lambda_zips_bucket" {
@@ -80,7 +81,7 @@ module "next_lambda" {
     allow_methods     = ["*"]
   }
 
-  environment_variables = var.next_lambda_env_vars
+  environment_variables = concat(local.lambda_default_env_vars, var.next_lambda_env_vars)
 
   allowed_triggers = {
     api_gateway = {

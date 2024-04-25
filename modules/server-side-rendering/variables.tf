@@ -33,3 +33,7 @@ variable "next_lambda_ephemeral_storage_size" {
 variable "api_gateway_log_format" {
   type = string
 }
+
+variable "use_default_server_side_props_handler" {
+  type = bool
+}
