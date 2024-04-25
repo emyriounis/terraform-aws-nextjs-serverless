@@ -25,6 +25,7 @@ module "server-side-rendering" {
 
   next_lambda_env_vars                  = var.next_lambda_env_vars
   next_lambda_policy_statements         = var.next_lambda_policy_statements
+  show_debug_logs                       = var.show_debug_logs
   use_default_server_side_props_handler = var.use_default_server_side_props_handler
 
   api_gateway_log_format = var.api_gateway_log_format

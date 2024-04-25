@@ -1,6 +1,6 @@
 {
   "name": "ns-build",
-  "version": "0.3.3",
+  "version": "0.3.4",
   "description": "Bash script to build serverless component for deploying to AWS using Terraform",
   "bin": {
     "ns-build": "./bin/ns-build.sh"
@@ -8,7 +8,7 @@
   "license": "Apache-2.0",
   "main": "index.js",
   "scripts": {
-    "build": "tsc server.ts"
+    "pre-publish": "tsc server.ts"
   },
   "repository": {
     "type": "git",

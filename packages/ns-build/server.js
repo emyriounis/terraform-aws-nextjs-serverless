@@ -52,6 +52,11 @@ var next_server_1 = require("next/dist/server/next-server");
 var serverless_http_1 = require("serverless-http");
 // @ts-ignore
 var required_server_files_json_1 = require("./.next/required-server-files.json");
+var showDebugLogs = process.env.SHOW_DEBUG_LOGS === 'true';
+var useCustomServerSidePropsHandler = function (path) {
+    return process.env.DEFAULT_SS_PROPS_HANDLER !== 'true' &&
+        path.includes('/_next/data/');
+};
 var getProps = function (event, context) { return __awaiter(void 0, void 0, void 0, function () {
     var path, getServerSideProps, customResponse, response;
     return __generator(this, function (_a) {
@@ -64,13 +69,16 @@ var getProps = function (event, context) { return __awaiter(void 0, void 0, void
                         .slice(1)
                         .join('/')
                         .replace('.json', '.js');
+                showDebugLogs && console.log({ path: path });
                 getServerSideProps = require(path).getServerSideProps;
                 return [4 /*yield*/, getServerSideProps(context)];
             case 1:
                 customResponse = _a.sent();
+                showDebugLogs && console.log({ customResponse: customResponse });
                 response = {};
                 response.statusCode = 200;
                 response.body = JSON.stringify({ pageProps: customResponse.props });
+                showDebugLogs && console.log({ response: response });
                 return [2 /*return*/, response];
         }
     });
@@ -88,7 +96,9 @@ var main = (0, serverless_http_1["default"])(nextServer.getRequestHandler(), {
     provider: 'aws'
 });
 var handler = function (event, context) {
-    return !process.env.DEFAULT_SS_PROPS_HANDLER && event.rawPath.includes('/_next/data/')
+    showDebugLogs && console.debug({ event: event });
+    showDebugLogs && console.debug({ context: context });
+    return useCustomServerSidePropsHandler(event.rawPath)
         ? getProps(event, context)
         : main(event, context);
 };

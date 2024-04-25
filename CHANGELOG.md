@@ -4,11 +4,17 @@ All notable changes to this project will be documented in this file.
 
 <!-- ## [Unreleased] -->
 
+## [v0.3.4] - 2024-04-25
+
+Updates:
+
+- Add `show_debug_logs` variable to enabled debug logs
+
 ## [v0.3.3] - 2024-04-25
 
 Updates:
 
-- Add `use_default_server_side_props_handler` variable to to enabled usage of the default server side props handler, instead of the our custom one
+- Add `use_default_server_side_props_handler` variable to enabled usage of the default server side props handler, instead of the our custom one
 
 ## [v0.3.2] - 2024-04-23
 
