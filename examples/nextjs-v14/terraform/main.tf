@@ -1,7 +1,7 @@
 module "next_serverless" {
   # source = "../../../"
   source  = "emyriounis/nextjs-serverless/aws"
-  version = "0.3.4"
+  version = "0.3.6"
 
   providers = {
     aws.global_region = aws.global_region
@@ -11,12 +11,14 @@ module "next_serverless" {
   region          = var.region
   base_dir        = var.base_dir
 
-  next_lambda_runtime        = "nodejs20.x"
-  image_optimization_runtime = "nodejs20.x"
+  next_lambda_runtime        = "nodejs18.x"
+  image_optimization_runtime = "nodejs18.x"
 
   cloudfront_acm_certificate_arn = (var.deployment_domain != null) ? module.next_cloudfront_certificate[0].acm_certificate_arn : null
   cloudfront_aliases             = (var.deployment_domain != null) ? [var.deployment_domain] : []
 
+  show_debug_logs = true
+  # use_default_server_side_props_handler = true
   next_lambda_env_vars = {
     NODE_ENV = "production"
   }
