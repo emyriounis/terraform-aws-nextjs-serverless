@@ -26,6 +26,7 @@ module "server-side-rendering" {
   next_lambda_env_vars                  = var.next_lambda_env_vars
   next_lambda_policy_statements         = var.next_lambda_policy_statements
   show_debug_logs                       = var.show_debug_logs
+  override_host_header                  = var.override_host_header
   use_default_server_side_props_handler = var.use_default_server_side_props_handler
 
   api_gateway_log_format = var.api_gateway_log_format
@@ -71,4 +72,9 @@ module "distribution" {
   cloudfront_cache_default_ttl = var.cloudfront_cache_default_ttl
   cloudfront_cache_max_ttl     = var.cloudfront_cache_max_ttl
   cloudfront_cache_min_ttl     = var.cloudfront_cache_min_ttl
+
+  deployment_name                  = var.deployment_name
+  base_dir                         = var.base_dir
+  cloudfront_function_associations = var.cloudfront_function_associations
+  wait_for_distribution_deployment = var.wait_for_distribution_deployment
 }

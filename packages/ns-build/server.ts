@@ -5,6 +5,7 @@ import serverless from 'serverless-http'
 import { config } from './.next/required-server-files.json'
 
 const showDebugLogs = process.env.SHOW_DEBUG_LOGS === 'true'
+const overrideHostHeader = process.env.OVERRIDE_HOST_HEADER === 'true'
 
 const useCustomServerSidePropsHandler = (path: string) =>
   process.env.DEFAULT_SS_PROPS_HANDLER !== 'true' &&
@@ -51,8 +52,13 @@ const main = serverless(nextServer.getRequestHandler(), {
 })
 
 export const handler = (event: any, context: any) => {
-  showDebugLogs && console.debug({ event })
+  showDebugLogs && console.debug({ event }, JSON.parse(event?.queryStringParameters?.cf_event)?.request?.headers?.host?.value)
   showDebugLogs && console.debug({ context })
+
+  if (overrideHostHeader) {
+    const customDomainHost = JSON.parse(event?.queryStringParameters?.cf_event)?.request?.headers?.host?.value
+    event.headers.host = customDomainHost
+  }
 
   return useCustomServerSidePropsHandler(event.rawPath)
     ? getProps(event, context)

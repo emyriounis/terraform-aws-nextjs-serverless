@@ -4,15 +4,25 @@ All notable changes to this project will be documented in this file.
 
 <!-- ## [Unreleased] -->
 
-## [v0.3.4] - 2024-04-25
+## [v0.3.7] - 2024-04-29
 
-Updates:
+- Add `cloudfront_function_associations` variable to associate cloudfront functions with the defaulf distribution
+- Add `override_host_header` variable to enabled overriding of host header, by the custom domain
+- Add `wait_for_distribution_deployment` variable to stop waiting for the distribution status to change from `InProgress` to `Deployed`
+
+## [v0.3.6] - 2024-04-25
+
+- Bug fix next handler
+
+## [v0.3.5] - 2024-04-25
+
+- Bug fix next handler
+
+## [v0.3.4] - 2024-04-25
 
 - Add `show_debug_logs` variable to enabled debug logs
 
 ## [v0.3.3] - 2024-04-25
-
-Updates:
 
 - Add `use_default_server_side_props_handler` variable to enabled usage of the default server side props handler, instead of the our custom one
 

@@ -18,6 +18,43 @@ resource "aws_cloudfront_origin_access_identity" "image_optimization_oai" {
 ########### distribution ###########
 ####################################
 
+resource "aws_cloudfront_cache_policy" "next_distribution" {
+  name = "${var.deployment_name}-next-distribution-cache-policy"
+
+  default_ttl = var.cloudfront_cache_default_ttl
+  max_ttl     = var.cloudfront_cache_max_ttl
+  min_ttl     = var.cloudfront_cache_min_ttl
+
+  parameters_in_cache_key_and_forwarded_to_origin {
+    cookies_config {
+      cookie_behavior = "all"
+    }
+    headers_config {
+      header_behavior = "none"
+    }
+    query_strings_config {
+      query_string_behavior = "all"
+    }
+
+    enable_accept_encoding_brotli = true
+    enable_accept_encoding_gzip   = true
+  }
+}
+
+resource "aws_cloudfront_origin_request_policy" "next_distribution" {
+  name = "${var.deployment_name}-next-distribution-origin-request-policy"
+
+  cookies_config {
+    cookie_behavior = "all"
+  }
+  headers_config {
+    header_behavior = "none"
+  }
+  query_strings_config {
+    query_string_behavior = "all"
+  }
+}
+
 resource "aws_cloudfront_distribution" "next_distribution" {
   origin {
     domain_name = var.public_assets_bucket.s3_bucket_bucket_regional_domain_name
@@ -83,8 +120,9 @@ resource "aws_cloudfront_distribution" "next_distribution" {
     }
   }
 
-  enabled         = true
-  is_ipv6_enabled = true
+  enabled             = true
+  is_ipv6_enabled     = true
+  wait_for_deployment = var.wait_for_distribution_deployment
 
   aliases             = var.cloudfront_aliases
   default_root_object = null
@@ -193,11 +231,14 @@ resource "aws_cloudfront_distribution" "next_distribution" {
     cached_methods   = ["GET", "HEAD"]
     target_origin_id = aws_cloudfront_origin_access_identity.dynamic_assets_oai.id
 
-    forwarded_values {
-      query_string = true
+    cache_policy_id          = aws_cloudfront_cache_policy.next_distribution.id
+    origin_request_policy_id = aws_cloudfront_origin_request_policy.next_distribution.id
 
-      cookies {
-        forward = "all"
+    dynamic "function_association" {
+      for_each = var.cloudfront_function_associations
+      content {
+        event_type   = function_association.value.event_type
+        function_arn = function_association.value.function_arn
       }
     }
 

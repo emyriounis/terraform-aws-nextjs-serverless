@@ -112,15 +112,30 @@ variable "cloudfront_cache_default_ttl" {
 }
 
 variable "cloudfront_cache_max_ttl" {
-  description = "Default TTL in seconds for ordered cache behaviors"
+  description = "Maximum TTL in seconds for ordered cache behaviors"
   type        = number
   default     = 2592000
 }
 
 variable "cloudfront_cache_min_ttl" {
-  description = "Default TTL in seconds for ordered cache behaviors"
+  description = "Minimum TTL in seconds for ordered cache behaviors"
   type        = number
   default     = 0
+}
+
+variable "cloudfront_function_associations" {
+  description = "List of CloudFront functions, to associate them with the defaulf distribution"
+  type = list(object({
+    event_type   = string
+    function_arn = string
+  }))
+  default = []
+}
+
+variable "wait_for_distribution_deployment" {
+  description = "If enabled, the resource will wait for the distribution status to change from `InProgress` to `Deployed`"
+  type        = bool
+  default     = true
 }
 
 variable "use_default_server_side_props_handler" {
@@ -131,6 +146,12 @@ variable "use_default_server_side_props_handler" {
 
 variable "show_debug_logs" {
   description = "Boolean to enabled debug logs"
+  type        = bool
+  default     = false
+}
+
+variable "override_host_header" {
+  description = "Boolean to enabled overriding of host header, by the custom domain"
   type        = bool
   default     = false
 }

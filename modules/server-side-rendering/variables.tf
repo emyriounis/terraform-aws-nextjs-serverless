@@ -41,3 +41,7 @@ variable "use_default_server_side_props_handler" {
 variable "show_debug_logs" {
   type = bool
 }
+
+variable "override_host_header" {
+  type = bool
+}
