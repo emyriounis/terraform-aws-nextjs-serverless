@@ -1,3 +1,11 @@
+variable "deployment_name" {
+  type = string
+}
+
+variable "base_dir" {
+  type = string
+}
+
 variable "dynamic_origin_domain_name" {
   type = string
 }
@@ -53,4 +61,15 @@ variable "cloudfront_cache_max_ttl" {
 
 variable "cloudfront_cache_min_ttl" {
   type = number
+}
+
+variable "cloudfront_function_associations" {
+  type = list(object({
+    event_type   = string
+    function_arn = string
+  }))
+}
+
+variable "wait_for_distribution_deployment" {
+  type = bool
 }

@@ -43,6 +43,7 @@ next-env.d.ts
 .terraform.lock.hcl
 .terraform
 examples/nextjs-v13/terraform/.terraform*
+env.tfvars
 
 **/.DS_Store
 
