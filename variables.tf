@@ -149,9 +149,3 @@ variable "show_debug_logs" {
   type        = bool
   default     = false
 }
-
-variable "override_host_header" {
-  description = "Boolean to enabled overriding of host header, by the custom domain"
-  type        = bool
-  default     = false
-}

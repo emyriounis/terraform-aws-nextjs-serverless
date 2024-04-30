@@ -30,7 +30,10 @@ resource "aws_cloudfront_cache_policy" "next_distribution" {
       cookie_behavior = "all"
     }
     headers_config {
-      header_behavior = "none"
+      header_behavior = "whitelist"
+      headers {
+        items = ["x-forwarded-host"]
+      }
     }
     query_strings_config {
       query_string_behavior = "all"
@@ -48,7 +51,10 @@ resource "aws_cloudfront_origin_request_policy" "next_distribution" {
     cookie_behavior = "all"
   }
   headers_config {
-    header_behavior = "none"
+    header_behavior = "whitelist"
+    headers {
+      items = ["x-forwarded-host"]
+    }
   }
   query_strings_config {
     query_string_behavior = "all"

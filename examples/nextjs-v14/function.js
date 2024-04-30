@@ -1,26 +1,8 @@
 function handler(event) {
-  if (
-    event.request.querystring &&
-    event.request.querystring.cf_event &&
-    event.request.querystring.cf_event.value
-  ) {
-    return event.request
-  }
+  const request = event.request
+  const headers = request.headers
+  const host = request.headers.host.value
+  headers['x-forwarded-host'] = { value: host }
 
-  let url = `https://${event.request.headers.host.value}${event.request.uri}`
-  url += `?cf_event=${encodeURIComponent(JSON.stringify(event))}`
-
-  var response = {
-    statusCode: 302,
-    statusDescription: 'Found',
-    headers: {
-      'cloudfront-functions': { value: 'generated-by-CloudFront-Functions' },
-      location: {
-        value: url,
-      },
-    },
-  }
-  return response
-
-  // return event.request
+  return request
 }

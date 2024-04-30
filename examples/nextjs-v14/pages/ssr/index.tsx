@@ -20,14 +20,12 @@ const Home: NextPage = (props: any) => {
 
 // This gets called on every request
 export async function getServerSideProps(context: NextPageContext) {
-  console.log({context});
+  console.log({ context })
 
-  const baseUrl = `{{DISTRIBUTION_URL}}`
-
-  // Fetch data from external API
-  const res = await fetch(baseUrl + '/api/hello')
+  // Fetch data from nextjs API
+  const host = (context.req as any).apiGateway.event.headers['x-forwarded-host']
+  const res = await fetch('https://' + host + '/api/hello')
   const date = new Date()
-  console.log(date)
   const data = { ...(await res.json()), date: date.toISOString() }
 
   // Pass data to the page via props

@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 
 <!-- ## [Unreleased] -->
 
+## [v0.3.8] - 2024-04-30
+
+- Add `x-forwarded-host` headers to the request info
+- Deprecate `override_host_header` variable
+
 ## [v0.3.7] - 2024-04-29
 
 - Add `cloudfront_function_associations` variable to associate cloudfront functions with the defaulf distribution
