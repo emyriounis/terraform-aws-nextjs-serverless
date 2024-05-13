@@ -4,6 +4,9 @@ import serverless from 'serverless-http'
 // @ts-ignore
 import { config } from './.next/required-server-files.json'
 
+
+const imageTypes = ['webp', 'jpeg', 'png', 'gif', 'avif', 'svg']
+
 const showDebugLogs = process.env.SHOW_DEBUG_LOGS === 'true'
 
 const useCustomServerSidePropsHandler = (path: string) =>
@@ -50,9 +53,23 @@ const main = serverless(nextServer.getRequestHandler(), {
   provider: 'aws',
 })
 
-export const handler = (event: any, context: any) => {
+export const handler = (event: any, context: any, callback: any) => {
   showDebugLogs && console.debug({ event })
   showDebugLogs && console.debug({ context })
+
+  const path = event.rawPath;
+  if (imageTypes.some(type => path.includes(type))) {
+    const baseUrl = event.headers['x-forwarded-proto'] + '://' + event.headers['x-forwarded-host']
+
+    const response = {
+      statusCode: 301,
+      headers: {
+        Location: baseUrl + '/assets' + path,
+      },
+    };
+
+    return callback(null, response);
+  }
 
   return useCustomServerSidePropsHandler(event.rawPath)
     ? getProps(event, context)

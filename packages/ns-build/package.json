@@ -1,6 +1,6 @@
 {
   "name": "ns-build",
-  "version": "0.3.8",
+  "version": "0.3.9",
   "description": "Bash script to build serverless component for deploying to AWS using Terraform",
   "bin": {
     "ns-build": "./bin/ns-build.sh"

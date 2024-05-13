@@ -17,6 +17,7 @@ const next_server_1 = __importDefault(require("next/dist/server/next-server"));
 const serverless_http_1 = __importDefault(require("serverless-http"));
 // @ts-ignore
 const required_server_files_json_1 = require("./.next/required-server-files.json");
+const imageTypes = ['webp', 'jpeg', 'png', 'gif', 'avif', 'svg'];
 const showDebugLogs = process.env.SHOW_DEBUG_LOGS === 'true';
 const useCustomServerSidePropsHandler = (path) => process.env.DEFAULT_SS_PROPS_HANDLER !== 'true' &&
     path.includes('/_next/data/');
@@ -50,9 +51,20 @@ const main = (0, serverless_http_1.default)(nextServer.getRequestHandler(), {
     binary: ['*/*'],
     provider: 'aws',
 });
-const handler = (event, context) => {
+const handler = (event, context, callback) => {
     showDebugLogs && console.debug({ event });
     showDebugLogs && console.debug({ context });
+    const path = event.rawPath;
+    if (imageTypes.some(type => path.includes(type))) {
+        const baseUrl = event.headers['x-forwarded-proto'] + '://' + event.headers['x-forwarded-host'];
+        const response = {
+            statusCode: 301,
+            headers: {
+                Location: baseUrl + '/assets' + path,
+            },
+        };
+        return callback(null, response);
+    }
     return useCustomServerSidePropsHandler(event.rawPath)
         ? getProps(event, context)
         : main(event, context);
