@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 
 <!-- ## [Unreleased] -->
 
+## [v0.3.9] - 2024-05-13
+
+- Support all components for rendering images (`'webp', 'jpeg', 'png', 'gif', 'avif', 'svg'`)
+
 ## [v0.3.8] - 2024-04-30
 
 - Add `x-forwarded-host` headers to the request info

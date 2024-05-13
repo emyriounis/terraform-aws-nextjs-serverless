@@ -23,7 +23,7 @@ rm -r standalone
 rm -r deployments
 
 # Install necessary packages
-npm i -D serverless@3.38.0 serverless-esbuild@1.49.0 esbuild@0.19.7 serverless-http@3.2.0 ns-img-opt@0.3.8 ns-img-rdr@0.3.8
+npm i -D serverless@3.38.0 serverless-esbuild@1.49.0 esbuild@0.19.7 serverless-http@3.2.0 ns-img-opt@0.3.9 ns-img-rdr@0.3.9
 
 # Inject code in build, and cleanup
 cp -a ./app ./app-backup
@@ -71,29 +71,6 @@ cp -a .next/static static/_next
 
 # Prepare source code
 rm -r node_modules
-
-# update code to support public assets prefix
-find . -name '*.html' -exec sed -i.backup 's|src="/|src="/assets/|g' '{}' \;
-find . -name '*.html' -exec sed -i.backup 's|src="/assets/_next/|src="/_next/|g' '{}' \;
-find . -name '*.html' -exec sed -i.backup 's|href="/|href="/assets/|g' '{}' \;
-find . -name '*.html' -exec sed -i.backup 's|href="/assets/_next/|href="/_next/|g' '{}' \;
-find . -name '*.html' -exec sed -i.backup 's|src:"/|src:"/assets/|g' '{}' \;
-find . -name '*.html' -exec sed -i.backup 's|src:"/assets/_next/|src:"/_next/|g' '{}' \;
-find . -name '*.html' -exec sed -i.backup 's|image?url=%2Fassets%2F|image?url=%2F|g' '{}' \;
-find . -name '*.html' -exec sed -i.backup 's|url(/|url(/assets/|g' '{}' \;
-find . -name '*.css' -exec sed -i.backup 's|url\\(\\/|url\\(\\/assets\\/|g' '{}' \;
-find . -name '*.css' -exec sed -i.backup 's|url\\(\\/assets\\/_next|url\\(\\/_next|g' '{}' \;
-find . -name '*.css' -exec sed -i.backup 's|url(/|url(/assets/|g' '{}' \;
-find . -name '*.css' -exec sed -i.backup 's|url(/assets/_next|url(/_next|g' '{}' \;
-find . -name '*.js' -exec sed -i.backup 's|src="/|src="/assets/|g' '{}' \;
-find . -name '*.js' -exec sed -i.backup 's|src="/assets/_next/|src="/_next/|g' '{}' \;
-find . -name '*.js' -exec sed -i.backup 's|href="/|href="/assets/|g' '{}' \;
-find . -name '*.js' -exec sed -i.backup 's|href="/assets/_next/|href="/_next/|g' '{}' \;
-find . -name '*.js' -exec sed -i.backup 's|src:"/|src:"/assets/|g' '{}' \;
-find . -name '*.js' -exec sed -i.backup 's|src:"/assets/_next/|src:"/_next/|g' '{}' \;
-find . -name '*.js' -exec sed -i.backup 's|image?url=%2Fassets%2F|image?url=%2F|g' '{}' \;
-find . -name '*.js' -exec sed -i.backup 's|url(/|url(/assets/|g' '{}' \;
-find . -type f -name '*.backup' -exec rm {} +
 
 # optinal: add node_modules
 if [[ $copyAllPackages == true ]]; then
