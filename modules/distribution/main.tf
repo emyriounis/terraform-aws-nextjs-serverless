@@ -1,3 +1,7 @@
+data "aws_cloudfront_cache_policy" "caching_optimized" {
+  name = "Managed-CachingOptimized"
+}
+
 ####################################
 ############ lambdas_oai ###########
 ####################################
@@ -144,17 +148,7 @@ resource "aws_cloudfront_distribution" "next_distribution" {
       lambda_arn = var.image_optimization_qualified_arn
     }
 
-    forwarded_values {
-      query_string = true
-
-      cookies {
-        forward = "all"
-      }
-    }
-
-    default_ttl = var.cloudfront_cache_default_ttl
-    max_ttl     = var.cloudfront_cache_max_ttl
-    min_ttl     = var.cloudfront_cache_min_ttl
+    cache_policy_id = data.aws_cloudfront_cache_policy.caching_optimized.id
 
     viewer_protocol_policy = "redirect-to-https"
     compress               = true
@@ -172,17 +166,7 @@ resource "aws_cloudfront_distribution" "next_distribution" {
       include_body = true
     }
 
-    forwarded_values {
-      query_string = true
-
-      cookies {
-        forward = "all"
-      }
-    }
-
-    default_ttl = var.cloudfront_cache_default_ttl
-    max_ttl     = var.cloudfront_cache_max_ttl
-    min_ttl     = var.cloudfront_cache_min_ttl
+    cache_policy_id = data.aws_cloudfront_cache_policy.caching_optimized.id
 
     viewer_protocol_policy = "redirect-to-https"
     compress               = true
@@ -194,17 +178,7 @@ resource "aws_cloudfront_distribution" "next_distribution" {
     cached_methods   = ["GET", "HEAD", "OPTIONS"]
     target_origin_id = var.static_assets_origin_id.id
 
-    forwarded_values {
-      query_string = true
-
-      cookies {
-        forward = "all"
-      }
-    }
-
-    default_ttl = var.cloudfront_cache_default_ttl
-    max_ttl     = var.cloudfront_cache_max_ttl
-    min_ttl     = var.cloudfront_cache_min_ttl
+    cache_policy_id = data.aws_cloudfront_cache_policy.caching_optimized.id
 
     viewer_protocol_policy = "redirect-to-https"
     compress               = true
@@ -216,17 +190,7 @@ resource "aws_cloudfront_distribution" "next_distribution" {
     cached_methods   = ["GET", "HEAD", "OPTIONS"]
     target_origin_id = var.public_assets_origin_id.id
 
-    forwarded_values {
-      query_string = true
-
-      cookies {
-        forward = "all"
-      }
-    }
-
-    default_ttl = var.cloudfront_cache_default_ttl
-    max_ttl     = var.cloudfront_cache_max_ttl
-    min_ttl     = var.cloudfront_cache_min_ttl
+    cache_policy_id = data.aws_cloudfront_cache_policy.caching_optimized.id
 
     viewer_protocol_policy = "redirect-to-https"
     compress               = true

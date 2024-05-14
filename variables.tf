@@ -108,19 +108,19 @@ variable "image_optimization_ephemeral_storage_size" {
 variable "cloudfront_cache_default_ttl" {
   description = "Default TTL in seconds for ordered cache behaviors"
   type        = number
-  default     = 600
+  default     = 86400
 }
 
 variable "cloudfront_cache_max_ttl" {
   description = "Maximum TTL in seconds for ordered cache behaviors"
   type        = number
-  default     = 2592000
+  default     = 31536000
 }
 
 variable "cloudfront_cache_min_ttl" {
   description = "Minimum TTL in seconds for ordered cache behaviors"
   type        = number
-  default     = 0
+  default     = 1
 }
 
 variable "cloudfront_function_associations" {

@@ -77,3 +77,14 @@ module "distribution" {
   cloudfront_function_associations = var.cloudfront_function_associations
   wait_for_distribution_deployment = var.wait_for_distribution_deployment
 }
+
+# trigger create-invalidation after every deployment
+resource "null_resource" "create_cloudfront_invalidation" {
+  triggers = {
+    always_run = timestamp()
+  }
+
+  provisioner "local-exec" {
+    command = "aws cloudfront create-invalidation --distribution-id ${module.distribution.next_distribution.id} --paths '/*' "
+  }
+}

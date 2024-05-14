@@ -4,6 +4,14 @@ All notable changes to this project will be documented in this file.
 
 <!-- ## [Unreleased] -->
 
+## [v0.4.1] - 2024-05-14
+
+- Bugfix: disable caching for server-side rendering
+
+## [v0.4.0] - 2024-05-14
+
+- Support `context` argument on `getServerSideProps()`, when using the `pages/` router
+
 ## [v0.3.9] - 2024-05-13
 
 - Support all components for rendering images (`'webp', 'jpeg', 'png', 'gif', 'avif', 'svg'`)

@@ -1,4 +1,4 @@
-import type { NextPage, NextPageContext } from 'next'
+import type { GetServerSidePropsContext, NextPage } from 'next'
 import { Dispatch, SetStateAction, createContext, useState } from 'react'
 import SSR from './SSR'
 
@@ -19,11 +19,11 @@ const Home: NextPage = (props: any) => {
 }
 
 // This gets called on every request
-export async function getServerSideProps(context: NextPageContext) {
+export async function getServerSideProps(context: GetServerSidePropsContext) {
   console.log({ context })
 
   // Fetch data from nextjs API
-  const host = (context.req as any).apiGateway.event.headers['x-forwarded-host']
+  const host = context.req.headers.host
   const res = await fetch('https://' + host + '/api/hello')
   const date = new Date()
   const data = { ...(await res.json()), date: date.toISOString() }
