@@ -80,6 +80,8 @@ module "distribution" {
 
 # trigger create-invalidation after every deployment
 resource "null_resource" "create_cloudfront_invalidation" {
+  count = var.create_cloudfront_invalidation ? 1 : 0
+
   triggers = {
     always_run = timestamp()
   }

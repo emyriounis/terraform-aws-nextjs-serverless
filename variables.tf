@@ -132,6 +132,12 @@ variable "cloudfront_function_associations" {
   default = []
 }
 
+variable "create_cloudfront_invalidation" {
+  description = "Boolean to disable the trigger for cloudfront invalidation after every deployment"
+  type        = bool
+  default     = true
+}
+
 variable "wait_for_distribution_deployment" {
   description = "If enabled, the resource will wait for the distribution status to change from `InProgress` to `Deployed`"
   type        = bool
