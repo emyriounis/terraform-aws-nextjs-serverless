@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 
 <!-- ## [Unreleased] -->
 
+## [v0.4.2] - 2024-05-14
+
+- Add `create_cloudfront_invalidation` tf variable
+
 ## [v0.4.1] - 2024-05-14
 
 - Bugfix: disable caching for server-side rendering
