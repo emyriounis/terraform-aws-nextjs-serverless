@@ -9,7 +9,7 @@ resource "aws_cloudfront_function" "test" {
 module "next_serverless" {
   # source = "../../../"
   source  = "emyriounis/nextjs-serverless/aws"
-  version = "0.3.9"
+  version = "0.4.1"
 
   providers = {
     aws.global_region = aws.global_region
@@ -27,7 +27,7 @@ module "next_serverless" {
 
   wait_for_distribution_deployment      = false
   show_debug_logs                       = true
-  use_default_server_side_props_handler = true
+  use_default_server_side_props_handler = false
 
   cloudfront_function_associations = [{
     event_type   = "viewer-request"
