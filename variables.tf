@@ -45,6 +45,12 @@ variable "next_lambda_env_vars" {
   default     = {}
 }
 
+variable "custom_image_types" {
+  description = "List of image file extentions that you store in the public/ directory. ('webp', 'jpeg', 'jpg', 'png', 'gif', 'heif', 'heic', 'ico', 'tiff', 'avif', 'svg') are always whitelisted"
+  type        = list(string)
+  default     = []
+}
+
 variable "next_lambda_policy_statements" {
   description = "Map of dynamic policy statements to attach to Lambda Function role"
   type        = map(any)
