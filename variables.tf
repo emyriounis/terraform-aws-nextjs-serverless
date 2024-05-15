@@ -48,7 +48,7 @@ variable "next_lambda_env_vars" {
 variable "custom_image_types" {
   description = "List of image file extentions that you store in the public/ directory. Defaults to ('webp', 'jpeg', 'jpg', 'png', 'gif', 'ico', 'svg')"
   type        = list(string)
-  default     = []
+  default     = ["webp", "jpeg", "jpg", "png", "gif", "ico", "svg"]
 }
 
 variable "next_lambda_policy_statements" {
@@ -64,9 +64,9 @@ variable "next_lambda_memory_size" {
 }
 
 variable "next_lambda_runtime" {
-  description = "The runtime for the next lambda (nodejs16.x or nodejs18.x)"
+  description = "The runtime for the next lambda (nodejs16.x or nodejs20.x)"
   type        = string
-  default     = "nodejs18.x"
+  default     = "nodejs20.x"
 }
 
 variable "next_lambda_logs_retention" {
@@ -88,9 +88,9 @@ variable "api_gateway_log_format" {
 }
 
 variable "image_optimization_runtime" {
-  description = "The runtime for the image optimization Lambdas (nodejs16.x or nodejs18.x)"
+  description = "The runtime for the image optimization Lambdas (nodejs16.x or nodejs20.x)"
   type        = string
-  default     = "nodejs18.x"
+  default     = "nodejs20.x"
 }
 
 variable "image_optimization_lambda_memory_size" {
