@@ -1,6 +1,6 @@
 {
   "name": "ns-img-rdr",
-  "version": "0.4.3",
+  "version": "0.4.5",
   "description": "Image Redirection Lambda",
   "main": "index.js",
   "scripts": {

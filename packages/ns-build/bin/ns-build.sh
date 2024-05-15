@@ -23,7 +23,7 @@ rm -r standalone
 rm -r deployments
 
 # Install necessary packages
-npm i -D serverless@3.38.0 serverless-esbuild@1.49.0 esbuild@0.19.7 serverless-http@3.2.0 ns-img-opt@0.4.3 ns-img-rdr@0.4.3
+npm i -D serverless@3.38.0 serverless-esbuild@1.49.0 esbuild@0.19.7 serverless-http@3.2.0 ns-img-opt@0.4.5 ns-img-rdr@0.4.5
 
 # Inject code in build, and cleanup
 cp -a ./app ./app-backup
