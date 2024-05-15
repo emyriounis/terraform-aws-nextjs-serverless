@@ -46,7 +46,7 @@ variable "next_lambda_env_vars" {
 }
 
 variable "custom_image_types" {
-  description = "List of image file extentions that you store in the public/ directory. ('webp', 'jpeg', 'jpg', 'png', 'gif', 'heif', 'heic', 'ico', 'tiff', 'avif', 'svg') are always whitelisted"
+  description = "List of image file extentions that you store in the public/ directory. Defaults to ('webp', 'jpeg', 'jpg', 'png', 'gif', 'ico', 'svg')"
   type        = list(string)
   default     = []
 }

@@ -4,8 +4,7 @@ import serverless from 'serverless-http'
 // @ts-ignore
 import { config } from './.next/required-server-files.json'
 
-const customImageTypes = process.env.CUSTOM_IMAGE_TYPES?.split(',') ?? []
-const imageTypes = [...customImageTypes, 'webp', 'jpeg', 'jpg', 'png', 'gif', 'heif', 'heic', 'ico', 'tiff', 'avif', 'svg']
+const imageTypes = process.env.CUSTOM_IMAGE_TYPES?.split(',') ?? ['webp', 'jpeg', 'jpg', 'png', 'gif', 'ico', 'svg']
 
 const showDebugLogs = process.env.SHOW_DEBUG_LOGS === 'true'
 
@@ -115,7 +114,7 @@ export const handler = (event: any, context: any, callback: any) => {
   showDebugLogs && console.debug({ parsedEvent })
 
   /* If an image is requested, redirect to the corresponding S3 bucket. */
-  if (imageTypes.some(type => parsedEvent.path.includes(type))) {
+  if (imageTypes.some(type => parsedEvent.path.includes('.' + type))) {
     const response = {
       statusCode: 301,
       headers: {
