@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 
 <!-- ## [Unreleased] -->
 
+## [v1.0.0] - 2024-05-15
+
+- Finally, we reached the point that we can consider this module as `stable`, while supporting the most popular **Next.js** feature for **pages/** router
+
 ## [v0.4.6] - 2024-05-15
 
 - Pump default nodejs runtime to v18
