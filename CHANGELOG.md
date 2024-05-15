@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 
 <!-- ## [Unreleased] -->
 
-## [v0.4.4] - 2024-05-15
+## [v0.4.5] - 2024-05-15
 
 - Bugfix: some default image types were breaking ssr lambda
 

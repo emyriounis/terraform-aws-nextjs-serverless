@@ -18,8 +18,7 @@ const next_server_1 = __importDefault(require("next/dist/server/next-server"));
 const serverless_http_1 = __importDefault(require("serverless-http"));
 // @ts-ignore
 const required_server_files_json_1 = require("./.next/required-server-files.json");
-const customImageTypes = (_b = (_a = process.env.CUSTOM_IMAGE_TYPES) === null || _a === void 0 ? void 0 : _a.split(',')) !== null && _b !== void 0 ? _b : [];
-const imageTypes = [...customImageTypes, 'webp', 'jpeg', 'jpg', 'png', 'gif', 'heif', 'heic', 'ico', 'tiff', 'avif', 'svg'];
+const imageTypes = (_b = (_a = process.env.CUSTOM_IMAGE_TYPES) === null || _a === void 0 ? void 0 : _a.split(',')) !== null && _b !== void 0 ? _b : ['webp', 'jpeg', 'jpg', 'png', 'gif', 'ico', 'svg'];
 const showDebugLogs = process.env.SHOW_DEBUG_LOGS === 'true';
 // Check if the custom server-side props handler should be used.
 const useCustomServerSidePropsHandler = (path) => process.env.DEFAULT_SS_PROPS_HANDLER !== 'true' &&
@@ -112,7 +111,7 @@ const handler = (event, context, callback) => {
     const parsedEvent = parseEvent(event);
     showDebugLogs && console.debug({ parsedEvent });
     /* If an image is requested, redirect to the corresponding S3 bucket. */
-    if (imageTypes.some(type => parsedEvent.path.includes(type))) {
+    if (imageTypes.some(type => parsedEvent.path.includes('.' + type))) {
         const response = {
             statusCode: 301,
             headers: {
