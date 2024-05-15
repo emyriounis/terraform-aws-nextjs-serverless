@@ -114,6 +114,7 @@ terraform apply
 - The `app/` folder must be in the root directory (ex. not in the `src/` directory)
 - When destroying the `next_serverless` module, Lambda@Edge function need at least 15mins to be destroy, since they're [replicated functions](https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/lambda-edge-delete-replicas.html)
 - In some rare cases, some modules can not be imported by next_lambda (for unknown reasons). To solve this issue use `ns-build --copyAllPackages` to copy all the packages or `ns-build --packages-to-copy=package_1,package_2,package_3` to copy specific packages only
+- Currently, we support the `pages/` router for node v16, v18, v20 & `app/` router for node v16
 
 ## Contributing
 

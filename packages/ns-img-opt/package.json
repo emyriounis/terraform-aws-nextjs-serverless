@@ -1,6 +1,6 @@
 {
   "name": "ns-img-opt",
-  "version": "0.4.6",
+  "version": "1.0.0",
   "description": "Image Optimization Lambda",
   "main": "index.js",
   "scripts": {
