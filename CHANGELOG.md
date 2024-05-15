@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 
 <!-- ## [Unreleased] -->
 
+## [v0.4.6] - 2024-05-15
+
+- Pump default nodejs runtime to v18
+- Completely disable caching for ssr paths
+- Fix redirect issue for public assets
+
 ## [v0.4.5] - 2024-05-15
 
 - Bugfix: some default image types were breaking ssr lambda

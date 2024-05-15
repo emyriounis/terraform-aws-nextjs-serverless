@@ -9,7 +9,7 @@ resource "aws_cloudfront_function" "test" {
 module "next_serverless" {
   # source = "../../../"
   source  = "emyriounis/nextjs-serverless/aws"
-  version = "0.4.5"
+  version = "0.4.6"
 
   providers = {
     aws.global_region = aws.global_region
@@ -18,9 +18,6 @@ module "next_serverless" {
   deployment_name = var.deployment_name
   region          = var.region
   base_dir        = var.base_dir
-
-  next_lambda_runtime        = "nodejs18.x"
-  image_optimization_runtime = "nodejs18.x"
 
   cloudfront_acm_certificate_arn = (var.deployment_domain != null) ? module.next_cloudfront_certificate[0].acm_certificate_arn : null
   cloudfront_aliases             = (var.deployment_domain != null) ? [var.deployment_domain] : []

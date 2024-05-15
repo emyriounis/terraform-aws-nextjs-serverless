@@ -66,7 +66,7 @@ const getProps = (event) => __awaiter(void 0, void 0, void 0, function* () {
     response.statusCode = 200;
     response.body = JSON.stringify({ pageProps: customResponse.props });
     response.headers = {
-        'Cache-Control': 'must-revalidate, max-age=600, stale-while-revalidate=2592000', // Serve cached content up to 30 days old while revalidating it after 10 minutes
+        'Cache-Control': 'no-store',
     };
     showDebugLogs && console.log({ response });
     return response;
