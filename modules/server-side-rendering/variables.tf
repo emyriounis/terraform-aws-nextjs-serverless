@@ -22,6 +22,10 @@ variable "next_lambda_env_vars" {
   type = map(any)
 }
 
+variable "custom_image_types" {
+  type = list(string)
+}
+
 variable "next_lambda_policy_statements" {
   type = map(any)
 }

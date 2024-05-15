@@ -4,7 +4,8 @@ import serverless from 'serverless-http'
 // @ts-ignore
 import { config } from './.next/required-server-files.json'
 
-const imageTypes = ['webp', 'jpeg', 'png', 'gif', 'avif', 'svg']
+const customImageTypes = process.env.CUSTOM_IMAGE_TYPES?.split(',') ?? []
+const imageTypes = [...customImageTypes, 'webp', 'jpeg', 'jpg', 'png', 'gif', 'heif', 'heic', 'ico', 'tiff', 'avif', 'svg']
 
 const showDebugLogs = process.env.SHOW_DEBUG_LOGS === 'true'
 

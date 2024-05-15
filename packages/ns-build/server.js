@@ -11,13 +11,15 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
+var _a, _b;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.handler = void 0;
 const next_server_1 = __importDefault(require("next/dist/server/next-server"));
 const serverless_http_1 = __importDefault(require("serverless-http"));
 // @ts-ignore
 const required_server_files_json_1 = require("./.next/required-server-files.json");
-const imageTypes = ['webp', 'jpeg', 'png', 'gif', 'avif', 'svg'];
+const customImageTypes = (_b = (_a = process.env.CUSTOM_IMAGE_TYPES) === null || _a === void 0 ? void 0 : _a.split(',')) !== null && _b !== void 0 ? _b : [];
+const imageTypes = [...customImageTypes, 'webp', 'jpeg', 'jpg', 'png', 'gif', 'heif', 'heic', 'ico', 'tiff', 'avif', 'svg'];
 const showDebugLogs = process.env.SHOW_DEBUG_LOGS === 'true';
 // Check if the custom server-side props handler should be used.
 const useCustomServerSidePropsHandler = (path) => process.env.DEFAULT_SS_PROPS_HANDLER !== 'true' &&
