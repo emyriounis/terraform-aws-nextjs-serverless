@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 
 <!-- ## [Unreleased] -->
+<!--  -->
+<!-- ## [Unreleased] -->
+
+## [v1.0.2] - 2024-06-07
+
+- Mark `next` as peer dependency
+- Silence zip process
+- Remove `app/` route example
+- pump version
 
 ## [v1.0.0] - 2024-05-15
 

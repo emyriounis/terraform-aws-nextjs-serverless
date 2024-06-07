@@ -12,7 +12,7 @@ cp -r node_modules/ build/node_modules/
 # zip
 cd build/
 rm -r ../source.zip
-zip -r ../source.zip *
+zip -r -q ../source.zip *
 cd ..
 
 # cleanup

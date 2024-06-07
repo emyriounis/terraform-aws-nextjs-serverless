@@ -9,7 +9,7 @@ resource "aws_cloudfront_function" "test" {
 module "next_serverless" {
   # source = "../../../"
   source  = "emyriounis/nextjs-serverless/aws"
-  version = "1.0.0"
+  version = "1.0.2"
 
   providers = {
     aws.global_region = aws.global_region
