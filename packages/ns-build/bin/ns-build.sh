@@ -23,7 +23,7 @@ rm -r standalone
 rm -r deployments
 
 # Install necessary packages
-npm i -D serverless@3.38.0 serverless-esbuild@1.49.0 esbuild@0.19.7 serverless-http@3.2.0 ns-img-opt@1.0.0 ns-img-rdr@1.0.0
+npm i -D serverless@3.38.0 serverless-esbuild@1.49.0 esbuild@0.19.7 serverless-http@3.2.0 ns-img-opt@1.0.2 ns-img-rdr@1.0.2
 
 # Inject code in build, and cleanup
 cp -a ./app ./app-backup
@@ -54,7 +54,9 @@ cp -a node_modules/esbuild nodejs/node_modules
 cp -a node_modules/serverless-http nodejs/node_modules
 
 # Zip node modules
-zip -r deployments/layer.zip nodejs
+echo "Generating layer.zip ..."
+zip -r -q deployments/layer.zip nodejs
+echo "layer.zip generated !"
 
 # Keep image optimization/redirection source code zips
 cd deployments
@@ -84,7 +86,9 @@ else
 fi
 
 # zip source code
-zip -r ../deployments/source.zip * .[!.]*
+echo "Generating source.zip ..."
+zip -r -q ../deployments/source.zip * .[!.]*
+echo "source.zip generated !"
 cd ..
 
 # Clean-up
