@@ -26,7 +26,7 @@ Please check our [testing guidelines](https://github.com/emyriounis/terraform-aw
 4. Make sure your changes are applied and existing functionality is not broken.
 5. Copy the updates you made to the `packages/ns-build/bin/ns-build.sh` file.
 
-### ns-img-rdr packeges
+### ns-img-rdr packages
 
 1. Make your changes
 2. Run `npm run prepare-lambda`
@@ -34,7 +34,7 @@ Please check our [testing guidelines](https://github.com/emyriounis/terraform-aw
 4. Re-deploy the module.
 5. Make sure your changes are applied and existing functionality is not broken.
 
-### ns-img-opt packeges
+### ns-img-opt packages
 
 1. Make your changes
 2. Run `npm run prepare-lambda`
