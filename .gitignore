@@ -48,7 +48,7 @@ env.tfvars
 **/.DS_Store
 
 **/deployments/
-**/standalone/
+**/.ns-build/
 
 packages/**/*.zip
 
