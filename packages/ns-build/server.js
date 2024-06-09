@@ -53,14 +53,25 @@ const getProps = (event) => __awaiter(void 0, void 0, void 0, function* () {
      * extracts the `getServerSideProps` function from that module to load
      * the server-side rendering logic dynamically based on the requested URL path.
      */
-    const { getServerSideProps } = require(path);
+    let getServerSidePropsVal;
+    try {
+        const { getServerSideProps } = require(path);
+        getServerSidePropsVal = getServerSideProps;
+    }
+    catch (err) {
+        showDebugLogs && console.log({ path, err });
+        return {
+            statusCode: 404,
+            body: 'resource not found',
+        };
+    }
     // Provide a custom server-side rendering context for the server-side rendering.
     const customSsrContext = {
         req: event,
         query: event.rawQueryString,
         resolvedUrl,
     };
-    const customResponse = yield getServerSideProps(customSsrContext);
+    const customResponse = yield getServerSidePropsVal(customSsrContext);
     showDebugLogs && console.log({ customResponse });
     const response = {};
     response.statusCode = 200;
