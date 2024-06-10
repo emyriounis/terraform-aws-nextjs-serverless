@@ -106,7 +106,7 @@ terraform apply
 
 ## Examples
 
-- [Next.js v13](https://github.com/emyriounis/terraform-aws-nextjs-serverless/tree/main/examples/nextjs-v13) Complete example with SSR, API, static pages, image optimization & custom domain
+- [Next.js v14](https://github.com/emyriounis/terraform-aws-nextjs-serverless/tree/main/examples/nextjs-v14) Complete example with SSR, API, static pages, image optimization & custom domain
 
 ## Known Issues
 
