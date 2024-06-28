@@ -6,6 +6,10 @@ All notable changes to this project will be documented in this file.
 <!--  -->
 <!-- ## [Unreleased] -->
 
+## [v1.0.3] - 2024-06-28
+
+- Add required dependencies for the module
+
 ## [v1.0.2] - 2024-06-07
 
 - Mark `next` as peer dependency
