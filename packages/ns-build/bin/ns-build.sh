@@ -67,16 +67,17 @@ npm run build || exit 1
 # Prepare deployment
 mkdir -p deployments || exit 1
 mkdir -p .ns-build || exit 1
+test -e standalone && rm -r standalone
 
 # Keep necessary files
 cp -a .next/static .next/standalone/.next || exit 1
-cp -a .next/standalone .ns-build/standalone || exit 1
-rm .ns-build/standalone/server.js || exit 1
-cp node_modules/ns-build/server.js .ns-build/standalone || exit 1
-cp next.config.js .ns-build/standalone || exit 1
+cp -a .next/standalone standalone || exit 1
+rm standalone/server.js || exit 1
+cp node_modules/ns-build/server.js standalone || exit 1
+cp next.config.js standalone || exit 1
 
 # Keeps necessary node modules
-cp -a .ns-build/standalone/node_modules .ns-build/nodejs || exit 1
+cp -a standalone/node_modules .ns-build/nodejs || exit 1
 cp -a node_modules/serverless .ns-build/nodejs/node_modules || exit 1
 cp -a node_modules/serverless-esbuild .ns-build/nodejs/node_modules || exit 1
 cp -a node_modules/esbuild .ns-build/nodejs/node_modules || exit 1
@@ -94,15 +95,15 @@ cp node_modules/ns-img-rdr/source.zip deployments/ns-img-rdr/ || exit 1
 cp node_modules/ns-img-opt/source.zip deployments/image-optimization/ || exit 1
 
 # Keep necessary files
-mkdir -p .ns-build/standalone/static/_next || exit 1
-cp -a .ns-build/standalone/.next/static .ns-build/standalone/static/_next || exit 1
+mkdir -p standalone/static/_next || exit 1
+cp -a standalone/.next/static standalone/static/_next || exit 1
 
 # Prepare source code
-test -d .ns-build/standalone/node_modules && rm -r .ns-build/standalone/node_modules
+test -d standalone/node_modules && rm -r standalone/node_modules
 
 # optinal: add node_modules
 if [ $copyAllPackages == true ]; then
-  cp -a .next/standalone/node_modules .ns-build/standalone/node_modules || exit 1
+  cp -a .next/standalone/node_modules standalone/node_modules || exit 1
 else
   mkdir node_modules
   for package in "${packages_to_copy[@]}"
@@ -113,5 +114,5 @@ fi
 
 # zip source code
 echo "Generating source.zip ..."
-( cd .ns-build/standalone && zip -r -q ../../deployments/source.zip * .[!.]* ) || exit 1
+( cd standalone && zip -r -q ../deployments/source.zip * .[!.]* ) || exit 1
 echo "source.zip generated !"
