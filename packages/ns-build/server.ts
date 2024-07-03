@@ -41,21 +41,26 @@ const getProps = async (event: any) => {
     resolvedUrl.split('/').slice(1).join('/').replace('.json', '.js')
   showDebugLogs && console.log({ path })
 
-  /**
+  /*
    * Dynamically import the module from the specified path and
    * extracts the `getServerSideProps` function from that module to load
    * the server-side rendering logic dynamically based on the requested URL path.
    */
-  let getServerSidePropsVal
-  try {
-    const { getServerSideProps } = require(path)
-    getServerSidePropsVal = getServerSideProps
-  } catch (err) {
-    showDebugLogs && console.log({ path, err })
+  const loadProps = (importPath: string) => {
+    try {
+      const { getServerSideProps } = require(importPath)
+      return getServerSideProps
+    } catch (err) {
+      showDebugLogs && console.log({ importPath, err })
+      return null
+    }
+  }
+  const getServerSideProps = loadProps(path)
+  if (getServerSideProps === null) {
     return {
       statusCode: 404,
       body: 'resource not found',
-    }
+    }    
   }
 
   // Provide a custom server-side rendering context for the server-side rendering.
@@ -64,7 +69,7 @@ const getProps = async (event: any) => {
     query: event.rawQueryString,
     resolvedUrl,
   }
-  const customResponse = await getServerSidePropsVal(customSsrContext)
+  const customResponse = await getServerSideProps(customSsrContext)
   showDebugLogs && console.log({ customResponse })
 
   const response: any = {}
