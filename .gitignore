@@ -49,6 +49,7 @@ env.tfvars
 
 **/deployments/
 **/standalone/
+**/.ns-build/
 
 packages/**/*.zip
 
