@@ -15,12 +15,30 @@ const useCustomServerSidePropsHandler = (path: string) =>
 
 // Modify the event object to match the one expected by Next.JS
 const parseEvent = (event: any) => {
-  event.path = event.rawPath
-  event.headers.host = event.headers['x-forwarded-host']
-  event.headers.referer =
-    event.headers['x-forwarded-proto'] +
-    '://' +
-    event.headers['x-forwarded-host']
+  event.path = event.rawPath || event.path
+  event.rawPath = event.path
+  event.headers = event.headers || {}
+  
+  let host = event.headers['x-forwarded-host'] || event.headers.host
+  if (event.multiValueHeaders && event.multiValueHeaders['x-forwarded-host'] && event.multiValueHeaders['x-forwarded-host'].length > 0) {
+    host = event.multiValueHeaders['x-forwarded-host'][0]
+    event.multiValueHeaders.host = [host]
+  }
+  event.headers.host = host
+
+  let proto = event.headers['x-forwarded-proto']
+  if (event.multiValueHeaders && event.multiValueHeaders['x-forwarded-proto'] && event.multiValueHeaders['x-forwarded-proto'].length > 0) {
+    proto = event.multiValueHeaders['x-forwarded-proto'][0]
+  }
+
+  let port = event.headers['x-forwarded-port'] || ''
+  if (event.multiValueHeaders && event.multiValueHeaders['x-forwarded-port'] && event.multiValueHeaders['x-forwarded-port'].length > 0) {
+    port = event.multiValueHeaders['x-forwarded-port'][0] || ''
+  }
+  if (port) {
+    port = ':' + port
+  }
+  event.headers.referer = proto + '://' + host + port
   return event
 }
 
@@ -143,4 +161,8 @@ export const handler = (event: any, context: any, callback: any) => {
   return useCustomServerSidePropsHandler(parsedEvent.rawPath)
     ? getProps(parsedEvent)
     : main(parsedEvent, context)
+}
+
+export const exportedForTests = {
+  parseEvent,
 }
