@@ -13,7 +13,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 var _a, _b;
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.handler = void 0;
+exports.exportedForTests = exports.handler = void 0;
 const next_server_1 = __importDefault(require("next/dist/server/next-server"));
 const serverless_http_1 = __importDefault(require("serverless-http"));
 // @ts-ignore
@@ -141,3 +141,8 @@ const handler = (event, context, callback) => {
         : main(parsedEvent, context);
 };
 exports.handler = handler;
+exports.exportedForTests = {
+    useCustomServerSidePropsHandler,
+    parseEvent,
+    getProps,
+};
