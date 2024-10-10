@@ -81,8 +81,3 @@ resource "aws_s3_bucket_policy" "public_assets_bucket_policy" {
   bucket = module.public_assets_bucket.s3_bucket_id
   policy = data.aws_iam_policy_document.public_assets_s3_policy.json
 }
-
-
-output "all_resized_images_paths" {
-  value = local.all_resized_images_paths_map
-}
