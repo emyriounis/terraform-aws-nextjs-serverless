@@ -1,6 +1,6 @@
 export const defaults = {
-  width: 200,
-  quality: 80,
+  width: 256,
+  quality: 75,
 }
 
 export const limits = {

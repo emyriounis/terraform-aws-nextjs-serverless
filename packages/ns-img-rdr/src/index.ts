@@ -11,6 +11,29 @@ const imageTypes = [
   // 'image/apng',
 ]
 
+/* A list of specific image widths. These values represent different width
+dimensions that are commonly used for images. */
+const imageWidths = [16, 32, 64, 128, 256, 512, 1024]
+
+/**
+ * Returns the closest image width from a predefined list that is greater
+ * than or equal to the requested width, with a maximum limit of 1024.
+ * @param {number} requestedWidth - The width of an image that a user is requesting.
+ * @returns The first width in the `imageWidths` array that is greater than or equal to the `requestedWidth`.
+ * If no such width is found, it will return 1024 as a fallback value to avoid exceeding cloudfront limits.
+ */
+const mapImageWidth = (requestedWidth: string): string => {
+  const requestedWidthInt = parseInt(requestedWidth)
+
+  for (const width of imageWidths) {
+    if (width < requestedWidthInt) continue
+
+    return width.toString()
+  }
+
+  return '1024' // avoid bigger widths, they'll hit cloudfront limits
+}
+
 /**
  * The function `redirectTo` is used to create a redirect response with a specified URL.
  * @param {string} url - The `url` parameter is a string that represents the URL to which you want to
@@ -80,29 +103,32 @@ export const handler = async (event: any, _context: any, callback: any) => {
       )
 
     // Return original image if it's remote image
-    if (/^(http|https)%3A%2F%2F/.test(query?.url)) {
+    if (/^(http|https)%3A%2F%2F/.test(query.url)) {
       /* The URL for the original image. */
-      const imageUrl = query?.url.replace(/%3A/g, ':').replace(/%2F/g, '/')
-      console.log({ imageUrl });
+      const imageUrl = query.url.replace(/%3A/g, ':').replace(/%2F/g, '/')
+      console.log({ imageUrl })
       return redirectTo(imageUrl, callback)
     }
 
     // Return original image if it's static image
-    if (/_next/.test(query?.url)) {
+    if (/_next/.test(query.url)) {
       /* The URL for the original image. */
       const imageUrl =
         'https://' +
         config?.distributionDomainName +
-        query?.url.replace(/%2F/g, '/')
+        query.url.replace(/%2F/g, '/')
       return redirectTo(imageUrl, callback)
     }
 
     // Return original image if it's image/gif or image/svg+xml
     const regex = /\.(gif|svg|xml)$/
-    if (regex.test(query?.url)) {
+    if (regex.test(query.url)) {
       /* The URL for the original image. */
       const imageUrl =
-        'https://' + config?.distributionDomainName + '/assets' + query?.url
+        'https://' +
+        config?.distributionDomainName +
+        '/assets' +
+        query.url.replace(/%2F/g, '/')
       return redirectTo(imageUrl, callback)
     }
 
@@ -125,13 +151,15 @@ export const handler = async (event: any, _context: any, callback: any) => {
       }
     }
 
+    const { w: requestedWidth, q: quality, url } = query
+    const width = mapImageWidth(requestedWidth)
     /*  Creating a URL string for the redirect. */
     const redirectToUrl = [
       baseUrl,
-      query?.w,
-      query?.q,
+      width,
+      quality,
       requestType.replace('image/', ''),
-      query?.url.replace('%2F', ''),
+      url.replace('%2F', ''),
     ]
       .join('/')
       .replace(/%2F/g, '/')
