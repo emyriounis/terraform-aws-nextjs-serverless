@@ -1,32 +1,4 @@
-import https from 'https'
-
-/**
- * @deprecated
- * The function fetchBufferFromUrl fetches a buffer from a given URL using the https module in Node.js.
- * @param {string} url - The `url` parameter is a string that represents the URL from which you want to
- * fetch the buffer.
- * @returns The function `fetchBufferFromUrl` returns a Promise that resolves to a Buffer.
- */
-export const fetchBufferFromUrl = (url: string): Promise<Buffer> => {
-  return new Promise((resolve, reject) => {
-    https.get(url, res => {
-      const chunks: any[] = []
-
-      res.on('data', chunk => {
-        chunks.push(chunk)
-      })
-
-      res.on('end', () => {
-        const buffer = Buffer.concat(chunks)
-        resolve(buffer)
-      })
-
-      res.on('error', error => {
-        reject(error)
-      })
-    })
-  })
-}
+import { HeadObjectCommand, S3Client } from "@aws-sdk/client-s3"
 
 /**
  * The function `redirectTo` is used to create a redirect response with a specified URL.
@@ -48,8 +20,30 @@ export const redirectTo = (url: string, callback: any) => {
           value: url,
         },
       ],
+      'cache-control': [
+        {
+          key: 'Cache-Control',
+          value: 'public, max-age=600, stale-while-revalidate=2592000', // Serve cached content up to 30 days old while revalidating it after 10 minutes
+        },
+      ],
     },
   }
 
   return callback(null, response)
+}
+
+export const isVersionStored = async (s3Client: S3Client, bucket: string, key: string): Promise<boolean> => {
+  try {
+    const command = new HeadObjectCommand({
+      Bucket: bucket,
+      Key: key,
+    })
+
+    // will throw error if it's not found
+    await s3Client.send(command)
+    return true
+  } catch (error) {
+    console.warn(`${key} is not stored yet`, error);
+    return false
+  }
 }

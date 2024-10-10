@@ -1,8 +1,12 @@
-import { GetObjectCommand, S3Client } from '@aws-sdk/client-s3'
+import {
+  GetObjectCommand,
+  PutObjectCommand,
+  S3Client,
+} from '@aws-sdk/client-s3'
 import sharp from 'sharp'
 
-import { defaults, limits } from './constants'
-import { redirectTo } from './helpers'
+import { defaults } from './constants'
+import { isVersionStored, redirectTo } from './helpers'
 
 /**
  * This TypeScript function is a CloudFront function that resizes and compresses images based on the
@@ -24,7 +28,7 @@ export const handler = async (event: any, _context: any, callback: any) => {
     /* Extract the `request` and `config` properties. */
     const { request, config } = event?.Records?.[0]?.cf
     /* Construct the base URL for the image assets. */
-    const baseUrl = config?.distributionDomainName + '/assets/'
+    const baseUrl = `https://${config?.distributionDomainName}/`
 
     /* The S3 region. */
     const s3Region =
@@ -38,68 +42,69 @@ export const handler = async (event: any, _context: any, callback: any) => {
     const queryString = (request?.uri as string)
       ?.replace('/_next/image/', '')
       ?.split('/')
-    // Build an object with these information
-    const query = {
-      width: parseInt(queryString?.[0] || defaults.width.toString()),
-      quality: parseInt(queryString?.[1] || defaults.quality.toString()),
-      type: 'image/' + queryString?.[2],
-      filename: queryString?.slice(3)?.join('/'),
-    }
-
-    // The url where the image is stored
-    const imageUrl = 'https://' + baseUrl + query.filename
-    // The options for image transformation
-    const options = {
-      quality: query.quality,
-    }
+    // Map required info
+    const width = parseInt(queryString?.[0] || defaults.width.toString())
+    const type = queryString?.[1]
+    const filename = queryString?.slice(2)?.join('/').replace('%2F', '/')
 
     /* The S3 Client. */
     const s3 = new S3Client({ region: s3Region })
+    const resizedImageFilename = `resized-assets/${width}/${type}/${filename}`
+
+    const isVersionAlreadyResized = await isVersionStored(s3, publicAssetsBucket, resizedImageFilename)
+    if (isVersionAlreadyResized) {
+      return redirectTo(baseUrl + resizedImageFilename, callback)
+    }
+
+    // The url where the image is stored
+    const imageUrl = baseUrl + 'assets/' + filename
+    // The options for image transformation
+    const options = { quality: defaults.quality }
 
     /* Build the s3 command. */
-    const s3Command = new GetObjectCommand({
+    const s3GetObjectCommand = new GetObjectCommand({
       Bucket: publicAssetsBucket,
-      Key: 'assets/' + query.filename.replace('%2F', '/'),
+      Key: 'assets/' + filename,
     })
 
     /* The body of the S3 object. */
-    const { Body } = await s3.send(s3Command)
+    const { Body } = await s3.send(s3GetObjectCommand)
     /* Transforming the body of the S3 object into a byte array. */
     const s3Object = await Body.transformToByteArray()
 
     /* Resize and compress the image. */
-    const resizedImage = sharp(s3Object).resize({ width: query.width })
+    const resizedImage = sharp(s3Object).resize({ width })
 
-    let newContentType = null
+    let newContentType: string | null = null
     /* Apply the corresponding image type transformation. */
-    switch (query.type) {
-      case 'image/webp':
+    switch (type) {
+      case 'webp':
         resizedImage.webp(options)
         newContentType = 'image/webp'
         break
-      case 'image/jpeg':
+      case 'jpeg':
         resizedImage.jpeg(options)
         newContentType = 'image/jpeg'
         break
-      case 'image/png':
+      case 'png':
         resizedImage.png(options)
         newContentType = 'image/png'
         break
-      // case 'image/gif':
+      // case 'gif':
       //   // resizedImage.gif(options)
       //   resizedImage.gif()
       //   newContentType = 'image/gif'
       //   break
-      // case 'image/apng':
+      // case 'apng':
       //   // resizedImage.apng(options)
       //   resizedImage.png(options)
       //   newContentType = 'image/apng'
       //   break
-      // case 'image/avif':
+      // case 'avif':
       //   resizedImage.avif(options)
       //   newContentType = 'image/avif'
       //   break
-      // // case 'image/svg+xml':
+      // // case 'svg+xml':
       // //   resizedImage.svg(options)
       // //   newContentType = 'image/svg+xml'
       // //   break
@@ -110,39 +115,18 @@ export const handler = async (event: any, _context: any, callback: any) => {
 
     /* Converting the resized image into a buffer. */
     const resizedImageBuffer = await resizedImage.toBuffer()
-    /* The response body in the CloudFront function is expected to be a base64 encoded string. */
-    const imageBase64 = resizedImageBuffer.toString('base64')
+    /* Store the resized image */
+    const s3PutObjectCommand = new PutObjectCommand({
+      Bucket: publicAssetsBucket,
+      Key: resizedImageFilename,
+      Body: resizedImageBuffer,
+      ContentType: newContentType,
+    })
+    await s3.send(s3PutObjectCommand)
 
-    /* If the resized image exceeds the Cloudfront response size limit, redirect to the original image */
-    if (imageBase64.length > limits.imageSize) {
-      return redirectTo(imageUrl, callback)
-    }
-
-    /* Define the response. */
-    const response = {
-      status: 200,
-      statusDescription: 'OK',
-      headers: {
-        'content-type': [
-          {
-            key: 'Content-Type',
-            value: newContentType,
-          },
-        ],
-        'cache-control': [
-          {
-            key: 'Cache-Control',
-            value: 'public, max-age=600, stale-while-revalidate=2592000', // Serve cached content up to 30 days old while revalidating it after 10 minutes
-          },
-        ],
-      },
-      bodyEncoding: 'base64',
-      body: imageBase64,
-    }
-
-    return callback(null, response)
+    return redirectTo(baseUrl + resizedImageFilename, callback)
   } catch (error) {
-    console.error({ error })
+    console.error('An unexpected occured', error)
 
     return callback(null, {
       status: 403, // to not leak data

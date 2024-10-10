@@ -2,6 +2,30 @@
 ####### public_assets_bucket #######
 ####################################
 
+locals {
+  base_dir = "${var.base_dir}public"
+
+  image_widths = [16, 32, 64, 128, 256, 512, 1024]
+  image_types  = ["webp", "jpeg", "png"]
+  image_combinations = flatten([
+    for width in local.image_widths : [
+      for type in local.image_types : "${width}/${type}"
+    ]
+  ])
+
+  all_paths = [
+    for file in module.public_assets_static_files.files : replace(file.source_path, "${local.base_dir}/", "")
+  ]
+
+  all_resized_images_paths_list = flatten([
+    for path in local.all_paths : [
+      for prefix in local.image_combinations : "${prefix}/${path}"
+    ]
+  ])
+
+  all_resized_images_paths_map = zipmap(tolist(range(length(local.all_resized_images_paths_list))), local.all_resized_images_paths_list)
+}
+
 module "public_assets_bucket" {
   source  = "terraform-aws-modules/s3-bucket/aws"
   version = "3.15.1"
@@ -22,7 +46,7 @@ module "public_assets_static_files" {
   source  = "hashicorp/dir/template"
   version = "1.0.2"
 
-  base_dir = "${var.base_dir}public"
+  base_dir = local.base_dir
 }
 
 resource "aws_s3_object" "public_assets_files" {
@@ -56,4 +80,9 @@ data "aws_iam_policy_document" "public_assets_s3_policy" {
 resource "aws_s3_bucket_policy" "public_assets_bucket_policy" {
   bucket = module.public_assets_bucket.s3_bucket_id
   policy = data.aws_iam_policy_document.public_assets_s3_policy.json
+}
+
+
+output "all_resized_images_paths" {
+  value = local.all_resized_images_paths_map
 }

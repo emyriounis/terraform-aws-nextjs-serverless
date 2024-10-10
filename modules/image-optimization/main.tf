@@ -39,7 +39,7 @@ module "image_optimization" {
   policy_statements = {
     s3_public_assets_bucket = {
       effect    = "Allow",
-      actions   = ["s3:GetObject"],
+      actions   = ["s3:GetObject", "s3:PutObject"],
       resources = ["${var.public_assets_bucket.s3_bucket_arn}/*"]
     }
   }
