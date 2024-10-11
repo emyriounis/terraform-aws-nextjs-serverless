@@ -6,6 +6,10 @@ All notable changes to this project will be documented in this file.
 <!--  -->
 <!-- ## [Unreleased] -->
 
+## [v1.1.2] - 2024-10-11
+
+- Add `delete_resized_versions` tf variable
+
 ## [v1.1.1] - 2024-10-11
 
 - Bugfix: having multiple images to pre-build was breaking terraform
