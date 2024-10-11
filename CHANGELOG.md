@@ -6,6 +6,14 @@ All notable changes to this project will be documented in this file.
 <!--  -->
 <!-- ## [Unreleased] -->
 
+## [v1.1.0] - 2024-10-11
+
+- Add `pre_resize_images` tf variable
+- Image optimization now returns speficic widths (16, 32, 64, 128, 256, 512, 1024)
+- Image quality for optimized images is now fix to 75%
+- On deployment, all image versions are optimized & stores to s3
+- Image optimization now redirects to `resized-assets/`, which serves already optimizated images
+
 ## [v1.0.3] - 2024-06-28
 
 - Add required dependencies for the module
