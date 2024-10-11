@@ -81,6 +81,8 @@ module "distribution" {
 
 # delete previously resized public assets
 resource "null_resource" "delete_resized_versions" {
+  count = var.delete_resized_versions ? 1 : 0
+
   provisioner "local-exec" {
     command = <<EOT
       aws s3 rm s3://${module.public-assets-hosting.public_assets_bucket.s3_bucket_id}/resized-assets/ --recursive

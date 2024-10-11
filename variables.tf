@@ -167,3 +167,9 @@ variable "pre_resize_images" {
   type        = bool
   default     = false
 }
+
+variable "delete_resized_versions" {
+  description = "Boolean to disable the trigger for deleting old resized versions of public images"
+  type        = bool
+  default     = true
+}
