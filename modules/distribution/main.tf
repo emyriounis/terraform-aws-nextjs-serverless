@@ -196,6 +196,18 @@ resource "aws_cloudfront_distribution" "next_distribution" {
     compress               = true
   }
 
+  ordered_cache_behavior {
+    path_pattern     = "/resized-assets/*"
+    allowed_methods  = ["GET", "HEAD", "OPTIONS"]
+    cached_methods   = ["GET", "HEAD", "OPTIONS"]
+    target_origin_id = var.public_assets_origin_id.id
+
+    cache_policy_id = data.aws_cloudfront_cache_policy.caching_optimized.id
+
+    viewer_protocol_policy = "redirect-to-https"
+    compress               = true
+  }
+
   default_cache_behavior {
     allowed_methods  = ["DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT"]
     cached_methods   = ["GET", "HEAD"]

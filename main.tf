@@ -79,9 +79,31 @@ module "distribution" {
   wait_for_distribution_deployment = var.wait_for_distribution_deployment
 }
 
+# delete previously resized public assets
+resource "null_resource" "delete_resized_versions" {
+  provisioner "local-exec" {
+    command = <<EOT
+      aws s3 rm s3://${module.public-assets-hosting.public_assets_bucket.s3_bucket_id}/resized-assets/ --recursive
+    EOT
+  }
+
+  triggers = {
+    always_run = timestamp()
+  }
+}
+
+# resize new public assets
+data "http" "resize_image_version" {
+  for_each   = var.pre_resize_images ? module.public-assets-hosting.all_resized_images_paths : {}
+  depends_on = [null_resource.create_cloudfront_invalidation]
+
+  url = "https://${module.distribution.next_distribution.domain_name}/_next/image/${each.value}"
+}
+
 # trigger create-invalidation after every deployment
 resource "null_resource" "create_cloudfront_invalidation" {
-  count = var.create_cloudfront_invalidation ? 1 : 0
+  count      = var.create_cloudfront_invalidation ? 1 : 0
+  depends_on = [null_resource.delete_resized_versions]
 
   triggers = {
     always_run = timestamp()

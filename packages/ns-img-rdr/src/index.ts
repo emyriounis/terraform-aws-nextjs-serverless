@@ -151,13 +151,12 @@ export const handler = async (event: any, _context: any, callback: any) => {
       }
     }
 
-    const { w: requestedWidth, q: quality, url } = query
+    const { w: requestedWidth, url } = query
     const width = mapImageWidth(requestedWidth)
     /*  Creating a URL string for the redirect. */
     const redirectToUrl = [
       baseUrl,
       width,
-      quality,
       requestType.replace('image/', ''),
       url.replace('%2F', ''),
     ]

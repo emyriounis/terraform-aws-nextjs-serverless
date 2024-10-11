@@ -22,6 +22,7 @@ module "next_serverless" {
   cloudfront_acm_certificate_arn = (var.deployment_domain != null) ? module.next_cloudfront_certificate[0].acm_certificate_arn : null
   cloudfront_aliases             = (var.deployment_domain != null) ? [var.deployment_domain] : []
 
+  pre_resize_images                     = true
   wait_for_distribution_deployment      = false
   show_debug_logs                       = true
   use_default_server_side_props_handler = false

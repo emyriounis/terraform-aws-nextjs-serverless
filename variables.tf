@@ -161,3 +161,9 @@ variable "show_debug_logs" {
   type        = bool
   default     = false
 }
+
+variable "pre_resize_images" {
+  description = "Boolean to enabled the resizing of public images, after each deployment. Enabling this might increase the AWS bill"
+  type        = bool
+  default     = false
+}
