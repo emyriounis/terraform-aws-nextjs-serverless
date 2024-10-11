@@ -23,7 +23,9 @@ locals {
     ]
   ])
 
-  all_resized_images_paths_map = zipmap(tolist(range(length(local.all_resized_images_paths_list))), local.all_resized_images_paths_list)
+  all_resized_images_paths_map = {
+    for idx, path in local.all_resized_images_paths_list : idx => path
+  }
 }
 
 module "public_assets_bucket" {
