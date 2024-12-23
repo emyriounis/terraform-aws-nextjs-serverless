@@ -87,6 +87,12 @@ variable "api_gateway_log_format" {
   default     = "sourceIp: $context.identity.sourceIp, $context.domainName $context.requestTime \"$context.httpMethod $context.path $context.routeKey $context.protocol\" path: $context.customDomain.basePathMatched resp_status: $context.status integrationLatency: $context.integrationLatency responseLatency: $context.responseLatency requestId: $context.requestId Error: $context.integrationErrorMessage rawRequestPayloadSize: $input.body.size() rawRequestPayload: $input.body" # https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-logging-variables.html
 }
 
+variable "enable_image_optimization" {
+  description = "Boolean to disable image optimization feature"
+  type        = bool
+  default     = true
+}
+
 variable "image_optimization_runtime" {
   description = "The runtime for the image optimization Lambdas (nodejs16.x or nodejs20.x)"
   type        = string
