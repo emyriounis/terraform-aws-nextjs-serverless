@@ -121,8 +121,11 @@ export const handler = async (event: any, _context: any, callback: any) => {
     }
 
     // Return original image if it's image/gif or image/svg+xml
+    // OR is the feature is disabled
+    const isFeatureEnabled =
+      request?.origin?.custom?.customHeaders?.['enable-image-optimization']?.[0]?.value === 'true'
     const regex = /\.(gif|svg|xml)$/
-    if (regex.test(query.url)) {
+    if (regex.test(query.url) || !isFeatureEnabled) {
       /* The URL for the original image. */
       const imageUrl =
         'https://' +

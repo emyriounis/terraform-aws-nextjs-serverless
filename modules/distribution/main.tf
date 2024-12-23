@@ -106,6 +106,11 @@ resource "aws_cloudfront_distribution" "next_distribution" {
       origin_protocol_policy = "https-only"
       origin_ssl_protocols   = ["TLSv1.2"]
     }
+
+    custom_header {
+      name  = "Enable-Image-Optimization"
+      value = var.enable_image_optimization ? "true" : "false"
+    }
   }
 
   origin {

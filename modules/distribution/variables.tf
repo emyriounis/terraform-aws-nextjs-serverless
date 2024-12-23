@@ -6,6 +6,10 @@ variable "base_dir" {
   type = string
 }
 
+variable "enable_image_optimization" {
+  type = bool
+}
+
 variable "dynamic_origin_domain_name" {
   type = string
 }
