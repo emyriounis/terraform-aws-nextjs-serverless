@@ -6,6 +6,10 @@ All notable changes to this project will be documented in this file.
 <!--  -->
 <!-- ## [Unreleased] -->
 
+## [v1.3.0] - 2025-02-11
+
+- Add `cloudfront_cached_paths` tf variable
+
 ## [v1.2.0] - 2024-12-23
 
 - Add `enable_image_optimization` tf variable
