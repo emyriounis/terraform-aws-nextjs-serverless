@@ -49,7 +49,8 @@ resource "aws_cloudfront_cache_policy" "next_distribution" {
 }
 
 resource "aws_cloudfront_cache_policy" "custom_paths_cache" {
-  name = "custom-paths-cache-policy"
+  count = length(var.cloudfront_cached_paths.paths) > 0 ? 1 : 0
+  name  = "${var.deployment_name}-custom-paths-cache-policy"
 
   default_ttl = var.cloudfront_cached_paths.default_ttl
   max_ttl     = var.cloudfront_cached_paths.max_ttl

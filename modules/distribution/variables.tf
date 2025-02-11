@@ -56,12 +56,19 @@ variable "public_assets_origin_id" {
 }
 
 variable "cloudfront_cached_paths" {
+  description = "An object containing a list of paths to cache and min, default and max TTL values"
   type = object({
     paths       = list(string)
     min_ttl     = number
     default_ttl = number
     max_ttl     = number
   })
+  default = {
+    paths       = []
+    min_ttl     = 0
+    default_ttl = 0
+    max_ttl     = 0
+  }
 }
 
 variable "cloudfront_cache_default_ttl" {
