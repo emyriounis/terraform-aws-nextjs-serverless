@@ -48,6 +48,29 @@ resource "aws_cloudfront_cache_policy" "next_distribution" {
   }
 }
 
+resource "aws_cloudfront_cache_policy" "custom_paths_cache" {
+  name = "custom-paths-cache-policy"
+
+  default_ttl = var.cloudfront_cached_paths.default_ttl
+  max_ttl     = var.cloudfront_cached_paths.max_ttl
+  min_ttl     = var.cloudfront_cached_paths.min_ttl
+
+  parameters_in_cache_key_and_forwarded_to_origin {
+    cookies_config {
+      cookie_behavior = "none"
+    }
+    headers_config {
+      header_behavior = "whitelist"
+      headers {
+        items = ["x-forwarded-host"]
+      }
+    }
+    query_strings_config {
+      query_string_behavior = "all"
+    }
+  }
+}
+
 resource "aws_cloudfront_origin_request_policy" "next_distribution" {
   name = "${var.deployment_name}-next-distribution-origin-request-policy"
 
@@ -211,6 +234,20 @@ resource "aws_cloudfront_distribution" "next_distribution" {
 
     viewer_protocol_policy = "redirect-to-https"
     compress               = true
+  }
+
+  dynamic "ordered_cache_behavior" {
+    for_each = var.cloudfront_cached_paths.paths
+    content {
+      path_pattern     = ordered_cache_behavior.value
+      allowed_methods  = ["GET", "HEAD", "OPTIONS"]
+      cached_methods   = ["GET", "HEAD", "OPTIONS"]
+      target_origin_id = aws_cloudfront_origin_access_identity.dynamic_assets_oai.id
+
+      cache_policy_id = aws_cloudfront_cache_policy.custom_paths_cache.id
+
+      viewer_protocol_policy = "redirect-to-https"
+    }
   }
 
   default_cache_behavior {

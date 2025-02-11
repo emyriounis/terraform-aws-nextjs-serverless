@@ -55,6 +55,15 @@ variable "public_assets_origin_id" {
   type = map(any)
 }
 
+variable "cloudfront_cached_paths" {
+  type = object({
+    paths       = list(string)
+    min_ttl     = number
+    default_ttl = number
+    max_ttl     = number
+  })
+}
+
 variable "cloudfront_cache_default_ttl" {
   type = number
 }
