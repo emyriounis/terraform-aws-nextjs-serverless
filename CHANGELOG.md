@@ -6,6 +6,10 @@ All notable changes to this project will be documented in this file.
 <!--  -->
 <!-- ## [Unreleased] -->
 
+## [v1.3.2] - 2025-02-11
+
+- Bugfix: add function assosiation for cached paths
+
 ## [v1.3.1] - 2025-02-11
 
 - Bugfix: reference to resourse in distribution module
