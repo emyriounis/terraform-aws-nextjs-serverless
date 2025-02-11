@@ -247,7 +247,16 @@ resource "aws_cloudfront_distribution" "next_distribution" {
 
       cache_policy_id = aws_cloudfront_cache_policy.custom_paths_cache[0].id
 
+      dynamic "function_association" {
+        for_each = var.cloudfront_function_associations
+        content {
+          event_type   = function_association.value.event_type
+          function_arn = function_association.value.function_arn
+        }
+      }
+
       viewer_protocol_policy = "redirect-to-https"
+      compress               = true
     }
   }
 
