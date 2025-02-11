@@ -6,6 +6,10 @@ All notable changes to this project will be documented in this file.
 <!--  -->
 <!-- ## [Unreleased] -->
 
+## [v1.3.1] - 2025-02-11
+
+- Bugfix: reference to resourse in distribution module
+
 ## [v1.3.0] - 2025-02-11
 
 - Add `cloudfront_cached_paths` tf variable
