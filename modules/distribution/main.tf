@@ -245,7 +245,7 @@ resource "aws_cloudfront_distribution" "next_distribution" {
       cached_methods   = ["GET", "HEAD", "OPTIONS"]
       target_origin_id = aws_cloudfront_origin_access_identity.dynamic_assets_oai.id
 
-      cache_policy_id = aws_cloudfront_cache_policy.custom_paths_cache.id
+      cache_policy_id = aws_cloudfront_cache_policy.custom_paths_cache[0].id
 
       viewer_protocol_policy = "redirect-to-https"
     }
