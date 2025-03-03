@@ -6,6 +6,10 @@ All notable changes to this project will be documented in this file.
 <!--  -->
 <!-- ## [Unreleased] -->
 
+## [v1.4.0] - 2025-03-03
+
+- Feature: enabled compression for cached paths
+
 ## [v1.3.2] - 2025-02-11
 
 - Bugfix: add function assosiation for cached paths
