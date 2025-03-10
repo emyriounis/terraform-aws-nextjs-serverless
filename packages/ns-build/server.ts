@@ -144,3 +144,9 @@ export const handler = (event: any, context: any, callback: any) => {
     ? getProps(parsedEvent)
     : main(parsedEvent, context)
 }
+
+export const exportedForTests = {
+  useCustomServerSidePropsHandler,
+  parseEvent,
+  getProps,
+}
