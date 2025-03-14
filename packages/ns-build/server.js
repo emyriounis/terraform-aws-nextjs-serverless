@@ -33,18 +33,19 @@ const useCustomServerSidePropsHandler = (path) => process.env.DEFAULT_SS_PROPS_H
     path.includes('/_next/data/');
 // Modify the event object to match the one expected by Next.JS
 const parseEvent = (event) => {
-    event.path = event.rawPath;
-    event.headers.host = event.headers['x-forwarded-host'];
-    event.headers.referer =
-        event.headers['x-forwarded-proto'] +
+    const parsedEvent = Object.assign(event);
+    parsedEvent.path = parsedEvent.rawPath;
+    parsedEvent.headers.host = parsedEvent.headers['x-forwarded-host'];
+    parsedEvent.headers.referer =
+        parsedEvent.headers['x-forwarded-proto'] +
             '://' +
-            event.headers['x-forwarded-host'];
-    return event;
+            parsedEvent.headers['x-forwarded-host'];
+    return parsedEvent;
 };
 /**
  * Dynamically load server-side rendering logic based on the
  * requested URL path and returns the page props in a JSON response.
- * @param {any} event - An object that contains information
+ * @param {ParsedEvent} event - An object that contains information
  * related to the incoming request triggering this function.
  * @returns Returns a response object with a status code of 200 and a body
  * containing the `pageProps` extracted from the custom response obtained by calling the
@@ -52,6 +53,7 @@ const parseEvent = (event) => {
  * serialized into a JSON string before being returned.
  */
 const getProps = (event) => __awaiter(void 0, void 0, void 0, function* () {
+    var _c;
     const resolvedUrl = event.rawPath.replace('/_next/data/', '');
     const path = './.next/server/pages/' +
         resolvedUrl.split('/').slice(1).join('/').replace('.json', '.js');
@@ -61,17 +63,17 @@ const getProps = (event) => __awaiter(void 0, void 0, void 0, function* () {
      * extracts the `getServerSideProps` function from that module to load
      * the server-side rendering logic dynamically based on the requested URL path.
      */
-    const loadProps = (importPath) => {
+    const loadProps = (importPath) => __awaiter(void 0, void 0, void 0, function* () {
         try {
-            const importedModule = require(importPath);
-            return importedModule;
+            const { getServerSideProps } = yield require(importPath);
+            return getServerSideProps;
         }
         catch (err) {
             showDebugLogs && console.log({ importPath, err });
             return null;
         }
-    };
-    const { getServerSideProps } = yield loadProps(path);
+    });
+    const getServerSideProps = yield loadProps(path);
     if (getServerSideProps === null) {
         return {
             statusCode: 404,
@@ -81,7 +83,7 @@ const getProps = (event) => __awaiter(void 0, void 0, void 0, function* () {
     // Provide a custom server-side rendering context for the server-side rendering.
     const customSsrContext = {
         req: event,
-        query: event.rawQueryString,
+        query: (_c = event.queryStringParameters) !== null && _c !== void 0 ? _c : {},
         resolvedUrl,
     };
     const customResponse = yield getServerSideProps(customSsrContext);
@@ -112,15 +114,15 @@ const main = (0, serverless_http_1.default)(nextServer.getRequestHandler(), {
 /**
  * The handler function processes an event, checks if an image is requested, and either redirects to an
  * S3 bucket or calls another function based on custom server-side props.
- * @param {any} event - The `event` parameter typically contains information about the HTTP request
+ * @param {APIGatewayProxyEventV2} event - The `event` parameter typically contains information about the HTTP request
  * that triggered the Lambda function. This can include details such as headers, query parameters, path
  * parameters, request body, and more. In your code snippet, the `event` object is being used to
  * extract information like the path and headers of
- * @param {any} context - The `context` parameter in the code snippet you provided is typically used to
+ * @param {Context} context - The `context` parameter in the code snippet you provided is typically used to
  * provide information about the execution environment and runtime context of the function. It can
  * include details such as the AWS Lambda function name, version, memory limit, request ID, and more.
  * This information can be useful for understanding the context
- * @param {any} callback - The `callback` parameter in the `handler` function is a function that you
+ * @param {Callback} callback - The `callback` parameter in the `handler` function is a function that you
  * can call to send a response back to the caller. In this case, the response is an HTTP response
  * object that includes a status code and headers. When you call `callback(null, response)`, you are
  * indicating that
@@ -139,7 +141,7 @@ const handler = (event, context, callback) => {
         const response = {
             statusCode: 301,
             headers: {
-                Location: event.headers.referer + '/assets' + event.path,
+                Location: parsedEvent.headers.referer + '/assets' + parsedEvent.path,
             },
         };
         return callback(null, response);
