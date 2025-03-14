@@ -1,8 +1,16 @@
 import { NextConfig } from 'next'
+import {
+  APIGatewayProxyEventV2,
+  APIGatewayProxyResultV2,
+  Callback,
+  Context,
+} from 'aws-lambda'
 import NextServer from 'next/dist/server/next-server'
 import serverless from 'serverless-http'
 // @ts-ignore
 import { config } from './.next/required-server-files.json'
+
+type ParsedEvent = APIGatewayProxyEventV2 & { path: string }
 
 const imageTypes = process.env.CUSTOM_IMAGE_TYPES?.split(',') ?? [
   'webp',
@@ -22,27 +30,28 @@ const useCustomServerSidePropsHandler = (path: string) =>
   path.includes('/_next/data/')
 
 // Modify the event object to match the one expected by Next.JS
-const parseEvent = (event: any) => {
-  event.path = event.rawPath
-  event.headers.host = event.headers['x-forwarded-host']
-  event.headers.referer =
-    event.headers['x-forwarded-proto'] +
+const parseEvent = (event: APIGatewayProxyEventV2): ParsedEvent => {
+  const parsedEvent: ParsedEvent = Object.assign(event)
+  parsedEvent.path = parsedEvent.rawPath
+  parsedEvent.headers.host = parsedEvent.headers['x-forwarded-host']
+  parsedEvent.headers.referer =
+    parsedEvent.headers['x-forwarded-proto'] +
     '://' +
-    event.headers['x-forwarded-host']
-  return event
+    parsedEvent.headers['x-forwarded-host']
+  return parsedEvent
 }
 
 /**
  * Dynamically load server-side rendering logic based on the
  * requested URL path and returns the page props in a JSON response.
- * @param {any} event - An object that contains information
+ * @param {ParsedEvent} event - An object that contains information
  * related to the incoming request triggering this function.
  * @returns Returns a response object with a status code of 200 and a body
  * containing the `pageProps` extracted from the custom response obtained by calling the
  * `getServerSideProps` function dynamically based on the requested URL path. The `pageProps` are
  * serialized into a JSON string before being returned.
  */
-const getProps = async (event: any) => {
+const getProps = async (event: ParsedEvent) => {
   const resolvedUrl = event.rawPath.replace('/_next/data/', '')
   const path =
     './.next/server/pages/' +
@@ -54,16 +63,16 @@ const getProps = async (event: any) => {
    * extracts the `getServerSideProps` function from that module to load
    * the server-side rendering logic dynamically based on the requested URL path.
    */
-  const loadProps = (importPath: string) => {
+  const loadProps = async (importPath: string) => {
     try {
-      const importedModule = require(importPath)
-      return importedModule
+      const { getServerSideProps } = await require(importPath)
+      return getServerSideProps
     } catch (err) {
       showDebugLogs && console.log({ importPath, err })
       return null
     }
   }
-  const { getServerSideProps } = await loadProps(path)
+  const getServerSideProps = await loadProps(path)
   if (getServerSideProps === null) {
     return {
       statusCode: 404,
@@ -74,13 +83,13 @@ const getProps = async (event: any) => {
   // Provide a custom server-side rendering context for the server-side rendering.
   const customSsrContext = {
     req: event,
-    query: event.rawQueryString,
+    query: event.queryStringParameters ?? {},
     resolvedUrl,
   }
   const customResponse = await getServerSideProps(customSsrContext)
   showDebugLogs && console.log({ customResponse })
 
-  const response: any = {}
+  const response: APIGatewayProxyResultV2 = {}
   response.statusCode = 200
   response.body = JSON.stringify({ pageProps: customResponse.props })
   response.headers = {
@@ -112,15 +121,15 @@ const main = serverless(nextServer.getRequestHandler(), {
 /**
  * The handler function processes an event, checks if an image is requested, and either redirects to an
  * S3 bucket or calls another function based on custom server-side props.
- * @param {any} event - The `event` parameter typically contains information about the HTTP request
+ * @param {APIGatewayProxyEventV2} event - The `event` parameter typically contains information about the HTTP request
  * that triggered the Lambda function. This can include details such as headers, query parameters, path
  * parameters, request body, and more. In your code snippet, the `event` object is being used to
  * extract information like the path and headers of
- * @param {any} context - The `context` parameter in the code snippet you provided is typically used to
+ * @param {Context} context - The `context` parameter in the code snippet you provided is typically used to
  * provide information about the execution environment and runtime context of the function. It can
  * include details such as the AWS Lambda function name, version, memory limit, request ID, and more.
  * This information can be useful for understanding the context
- * @param {any} callback - The `callback` parameter in the `handler` function is a function that you
+ * @param {Callback} callback - The `callback` parameter in the `handler` function is a function that you
  * can call to send a response back to the caller. In this case, the response is an HTTP response
  * object that includes a status code and headers. When you call `callback(null, response)`, you are
  * indicating that
@@ -129,7 +138,11 @@ const main = serverless(nextServer.getRequestHandler(), {
  * `main(parsedEvent, context)` function if `useCustomServerSidePropsHandler(parsedEvent.rawPath)`
  * returns false.
  */
-export const handler = (event: any, context: any, callback: any) => {
+export const handler = (
+  event: APIGatewayProxyEventV2,
+  context: Context,
+  callback: Callback
+) => {
   showDebugLogs && console.debug({ event })
   showDebugLogs && console.debug({ context })
 
@@ -141,7 +154,7 @@ export const handler = (event: any, context: any, callback: any) => {
     const response = {
       statusCode: 301,
       headers: {
-        Location: event.headers.referer + '/assets' + event.path,
+        Location: parsedEvent.headers.referer + '/assets' + parsedEvent.path,
       },
     }
 
