@@ -18,7 +18,15 @@ const next_server_1 = __importDefault(require("next/dist/server/next-server"));
 const serverless_http_1 = __importDefault(require("serverless-http"));
 // @ts-ignore
 const required_server_files_json_1 = require("./.next/required-server-files.json");
-const imageTypes = (_b = (_a = process.env.CUSTOM_IMAGE_TYPES) === null || _a === void 0 ? void 0 : _a.split(',')) !== null && _b !== void 0 ? _b : ['webp', 'jpeg', 'jpg', 'png', 'gif', 'ico', 'svg'];
+const imageTypes = (_b = (_a = process.env.CUSTOM_IMAGE_TYPES) === null || _a === void 0 ? void 0 : _a.split(',')) !== null && _b !== void 0 ? _b : [
+    'webp',
+    'jpeg',
+    'jpg',
+    'png',
+    'gif',
+    'ico',
+    'svg',
+];
 const showDebugLogs = process.env.SHOW_DEBUG_LOGS === 'true';
 // Check if the custom server-side props handler should be used.
 const useCustomServerSidePropsHandler = (path) => process.env.DEFAULT_SS_PROPS_HANDLER !== 'true' &&
@@ -55,15 +63,15 @@ const getProps = (event) => __awaiter(void 0, void 0, void 0, function* () {
      */
     const loadProps = (importPath) => {
         try {
-            const { getServerSideProps } = require(importPath);
-            return getServerSideProps;
+            const importedModule = require(importPath);
+            return importedModule;
         }
         catch (err) {
             showDebugLogs && console.log({ importPath, err });
             return null;
         }
     };
-    const getServerSideProps = loadProps(path);
+    const { getServerSideProps } = yield loadProps(path);
     if (getServerSideProps === null) {
         return {
             statusCode: 404,
