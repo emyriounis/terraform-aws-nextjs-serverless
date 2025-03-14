@@ -6,6 +6,10 @@ All notable changes to this project will be documented in this file.
 <!--  -->
 <!-- ## [Unreleased] -->
 
+## [v1.5.0] - 2025-03-14
+
+- Bugfix: SPA for static routes
+
 ## [v1.4.0] - 2025-03-03
 
 - Feature: enabled compression for cached paths

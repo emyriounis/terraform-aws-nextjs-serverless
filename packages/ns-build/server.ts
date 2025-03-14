@@ -4,7 +4,15 @@ import serverless from 'serverless-http'
 // @ts-ignore
 import { config } from './.next/required-server-files.json'
 
-const imageTypes = process.env.CUSTOM_IMAGE_TYPES?.split(',') ?? ['webp', 'jpeg', 'jpg', 'png', 'gif', 'ico', 'svg']
+const imageTypes = process.env.CUSTOM_IMAGE_TYPES?.split(',') ?? [
+  'webp',
+  'jpeg',
+  'jpg',
+  'png',
+  'gif',
+  'ico',
+  'svg',
+]
 
 const showDebugLogs = process.env.SHOW_DEBUG_LOGS === 'true'
 
@@ -48,19 +56,19 @@ const getProps = async (event: any) => {
    */
   const loadProps = (importPath: string) => {
     try {
-      const { getServerSideProps } = require(importPath)
-      return getServerSideProps
+      const importedModule = require(importPath)
+      return importedModule
     } catch (err) {
       showDebugLogs && console.log({ importPath, err })
       return null
     }
   }
-  const getServerSideProps = loadProps(path)
+  const { getServerSideProps } = await loadProps(path)
   if (getServerSideProps === null) {
     return {
       statusCode: 404,
       body: 'resource not found',
-    }    
+    }
   }
 
   // Provide a custom server-side rendering context for the server-side rendering.
