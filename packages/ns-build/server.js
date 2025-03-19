@@ -14,6 +14,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 var _a, _b;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.handler = void 0;
+const fs_1 = __importDefault(require("fs"));
+const path_1 = __importDefault(require("path"));
 const next_server_1 = __importDefault(require("next/dist/server/next-server"));
 const serverless_http_1 = __importDefault(require("serverless-http"));
 // @ts-ignore
@@ -42,6 +44,93 @@ const parseEvent = (event) => {
             parsedEvent.headers['x-forwarded-host'];
     return parsedEvent;
 };
+// Convert route file path to regex
+const routeToRegex = (filePath) => {
+    const relativePath = filePath
+        .replace('.next/server/pages', '')
+        .replace(/\.js$/, '');
+    const regexPattern = relativePath
+        .replace(/\/\[\[\.\.\.(\w+)\]\]/g, '(?:/(.*))?') // Handle [[...param]] correctly (no extra slash)
+        .replace(/\[\.\.\.(\w+)\]/g, '/(.*)') // Handle [...param]
+        .replace(/\[(\w+)\]/g, '/([^/]+)'); // Handle [param]
+    return {
+        regex: new RegExp('^' + regexPattern + '$'),
+        paramNames: [
+            ...relativePath.matchAll(/\[\[?\.\.\.(\w+)\]\]?|\[(\w+)\]/g),
+        ].map(m => m[1] || m[2]),
+        filePath,
+    };
+};
+// Get all Next.js dynamic routes
+const getAllNextRoutes = () => {
+    const dir = './.next/server/pages';
+    const allFiles = [];
+    function traverse(subdir) {
+        fs_1.default.readdirSync(subdir, { withFileTypes: true }).forEach(file => {
+            const fullPath = path_1.default.join(subdir, file.name);
+            if (file.isDirectory()) {
+                traverse(fullPath);
+            }
+            else if (fullPath.endsWith('.js') && fullPath.includes('[')) {
+                allFiles.push(fullPath);
+            }
+        });
+    }
+    traverse(dir);
+    return allFiles.map(routeToRegex);
+};
+// Match a request path to a known Next.js dynamic route
+const matchRoute = (requestPath) => {
+    const routes = getAllNextRoutes();
+    showDebugLogs && console.debug('Discovered routes:', getAllNextRoutes());
+    for (const { regex, paramNames, filePath } of routes) {
+        showDebugLogs && console.debug({ requestPath, regex, paramNames, filePath });
+        const match = requestPath.match(regex);
+        if (match) {
+            const params = paramNames.reduce((acc, param, i) => {
+                const value = match[i + 1] ? match[i + 1].split('/') : undefined;
+                if (value && value.length === 1) {
+                    acc[param] = value[0];
+                }
+                return acc;
+            }, {});
+            return { filePath, params };
+        }
+    }
+    return null;
+};
+// Load getServerSideProps with fallback to dynamic routes
+const loadProps = (importPath) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { getServerSideProps } = yield require(importPath);
+        return { getServerSideProps };
+    }
+    catch (err) {
+        showDebugLogs &&
+            console.debug(`Failed to directly load ${importPath}, trying dynamic route match...`, err);
+        // Extract the request path from the import path
+        const requestPath = importPath
+            .replace('./.next/server/pages', '')
+            .replace(/\.js$/, '');
+        // Try to match the request path dynamically
+        const matchedRoute = matchRoute(requestPath);
+        if (matchedRoute) {
+            try {
+                showDebugLogs &&
+                    console.debug(`Matched dynamic route: ${matchedRoute.filePath}`, {
+                        params: matchedRoute.params,
+                    });
+                const { getServerSideProps } = yield require(matchedRoute.filePath);
+                return { getServerSideProps, params: matchedRoute.params };
+            }
+            catch (fallbackErr) {
+                showDebugLogs &&
+                    console.debug(`Fallback failed for ${matchedRoute.filePath}`, fallbackErr);
+            }
+        }
+        return { getServerSideProps: null };
+    }
+});
 /**
  * Dynamically load server-side rendering logic based on the
  * requested URL path and returns the page props in a JSON response.
@@ -53,48 +142,44 @@ const parseEvent = (event) => {
  * serialized into a JSON string before being returned.
  */
 const getProps = (event) => __awaiter(void 0, void 0, void 0, function* () {
-    var _c;
+    var _c, _d;
     const resolvedUrl = event.rawPath.replace('/_next/data/', '');
     const path = './.next/server/pages/' +
         resolvedUrl.split('/').slice(1).join('/').replace('.json', '.js');
-    showDebugLogs && console.log({ path });
+    showDebugLogs && console.debug({ path });
     /*
      * Dynamically import the module from the specified path and
      * extracts the `getServerSideProps` function from that module to load
      * the server-side rendering logic dynamically based on the requested URL path.
      */
-    const loadProps = (importPath) => __awaiter(void 0, void 0, void 0, function* () {
-        try {
-            const { getServerSideProps } = yield require(importPath);
-            return getServerSideProps;
-        }
-        catch (err) {
-            showDebugLogs && console.log({ importPath, err });
-            return null;
-        }
-    });
-    const getServerSideProps = yield loadProps(path);
+    const { getServerSideProps, params } = yield loadProps(path);
     if (getServerSideProps === null) {
         return {
             statusCode: 404,
-            body: 'resource not found',
+            // statusCode: 200,
+            body: JSON.stringify({ notFound: true }),
         };
     }
     // Provide a custom server-side rendering context for the server-side rendering.
     const customSsrContext = {
         req: event,
         query: (_c = event.queryStringParameters) !== null && _c !== void 0 ? _c : {},
+        params,
         resolvedUrl,
     };
     const customResponse = yield getServerSideProps(customSsrContext);
-    showDebugLogs && console.log({ customResponse });
+    showDebugLogs && console.debug({ customResponse });
+    const redirectDestination = (_d = customResponse.redirect) === null || _d === void 0 ? void 0 : _d.destination;
+    const body = JSON.stringify(redirectDestination
+        ? { __N_REDIRECT: redirectDestination, __N_SSP: true }
+        : { pageProps: customResponse.props, __N_SSP: true });
     const response = {};
     response.statusCode = 200;
-    response.body = JSON.stringify({ pageProps: customResponse.props });
+    response.body = body;
     response.headers = {
         'Cache-Control': 'no-store',
     };
-    showDebugLogs && console.log({ response });
+    showDebugLogs && console.debug({ response });
     return response;
 });
 // Creating the Next.js Server
