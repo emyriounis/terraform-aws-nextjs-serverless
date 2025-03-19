@@ -1,3 +1,5 @@
+import fs from 'fs'
+import path from 'path'
 import { NextConfig } from 'next'
 import {
   APIGatewayProxyEventV2,
@@ -41,6 +43,109 @@ const parseEvent = (event: APIGatewayProxyEventV2): ParsedEvent => {
   return parsedEvent
 }
 
+// Convert route file path to regex
+const routeToRegex = (filePath: string) => {
+  const relativePath = filePath
+    .replace('.next/server/pages', '')
+    .replace(/\.js$/, '')
+  const regexPattern = relativePath
+    .replace(/\/\[\[\.\.\.(\w+)\]\]/g, '(?:/(.*))?') // Handle [[...param]] correctly (no extra slash)
+    .replace(/\[\.\.\.(\w+)\]/g, '/(.*)') // Handle [...param]
+    .replace(/\[(\w+)\]/g, '/([^/]+)') // Handle [param]
+
+  return {
+    regex: new RegExp('^' + regexPattern + '$'),
+    paramNames: [
+      ...relativePath.matchAll(/\[\[?\.\.\.(\w+)\]\]?|\[(\w+)\]/g),
+    ].map(m => m[1] || m[2]),
+    filePath,
+  }
+}
+
+// Get all Next.js dynamic routes
+const getAllNextRoutes = () => {
+  const dir = './.next/server/pages'
+  const allFiles: string[] = []
+
+  function traverse(subdir: string) {
+    fs.readdirSync(subdir, { withFileTypes: true }).forEach(file => {
+      const fullPath = path.join(subdir, file.name)
+
+      if (file.isDirectory()) {
+        traverse(fullPath)
+      } else if (fullPath.endsWith('.js') && fullPath.includes('[')) {
+        allFiles.push(fullPath)
+      }
+    })
+  }
+
+  traverse(dir)
+
+  return allFiles.map(routeToRegex)
+}
+
+// Match a request path to a known Next.js dynamic route
+const matchRoute = (requestPath: string) => {
+  const routes = getAllNextRoutes()
+  showDebugLogs && console.debug('Discovered routes:', getAllNextRoutes())
+
+  for (const { regex, paramNames, filePath } of routes) {
+    showDebugLogs && console.debug({ requestPath, regex, paramNames, filePath })
+    const match = requestPath.match(regex)
+    if (match) {
+      const params = paramNames.reduce((acc, param, i) => {
+        const value = match[i + 1] ? match[i + 1].split('/') : undefined
+
+        if (value && value.length === 1) {
+          acc[param] = value[0]
+        }
+
+        return acc
+      }, {} as Record<string, string | string[] | undefined>)
+
+      return { filePath, params }
+    }
+  }
+  return null
+}
+
+// Load getServerSideProps with fallback to dynamic routes
+const loadProps = async (importPath: string) => {
+  try {
+    const { getServerSideProps } = await require(importPath)
+    return { getServerSideProps }
+  } catch (err) {
+    showDebugLogs &&
+      console.debug(
+        `Failed to directly load ${importPath}, trying dynamic route match...`,
+        err
+      )
+    // Extract the request path from the import path
+    const requestPath = importPath
+      .replace('./.next/server/pages', '')
+      .replace(/\.js$/, '')
+    // Try to match the request path dynamically
+    const matchedRoute = matchRoute(requestPath)
+    if (matchedRoute) {
+      try {
+        showDebugLogs &&
+          console.debug(`Matched dynamic route: ${matchedRoute.filePath}`, {
+            params: matchedRoute.params,
+          })
+        const { getServerSideProps } = await require(matchedRoute.filePath)
+        return { getServerSideProps, params: matchedRoute.params }
+      } catch (fallbackErr) {
+        showDebugLogs &&
+          console.debug(
+            `Fallback failed for ${matchedRoute.filePath}`,
+            fallbackErr
+          )
+      }
+    }
+    return { getServerSideProps: null }
+  }
+}
+
 /**
  * Dynamically load server-side rendering logic based on the
  * requested URL path and returns the page props in a JSON response.
@@ -56,27 +161,19 @@ const getProps = async (event: ParsedEvent) => {
   const path =
     './.next/server/pages/' +
     resolvedUrl.split('/').slice(1).join('/').replace('.json', '.js')
-  showDebugLogs && console.log({ path })
+  showDebugLogs && console.debug({ path })
 
   /*
    * Dynamically import the module from the specified path and
    * extracts the `getServerSideProps` function from that module to load
    * the server-side rendering logic dynamically based on the requested URL path.
    */
-  const loadProps = async (importPath: string) => {
-    try {
-      const { getServerSideProps } = await require(importPath)
-      return getServerSideProps
-    } catch (err) {
-      showDebugLogs && console.log({ importPath, err })
-      return null
-    }
-  }
-  const getServerSideProps = await loadProps(path)
+  const { getServerSideProps, params } = await loadProps(path)
   if (getServerSideProps === null) {
     return {
       statusCode: 404,
-      body: 'resource not found',
+      // statusCode: 200,
+      body: JSON.stringify({ notFound: true }),
     }
   }
 
@@ -84,18 +181,26 @@ const getProps = async (event: ParsedEvent) => {
   const customSsrContext = {
     req: event,
     query: event.queryStringParameters ?? {},
+    params,
     resolvedUrl,
   }
   const customResponse = await getServerSideProps(customSsrContext)
-  showDebugLogs && console.log({ customResponse })
+  showDebugLogs && console.debug({ customResponse })
+
+  const redirectDestination = customResponse.redirect?.destination
+  const body = JSON.stringify(
+    redirectDestination
+      ? { __N_REDIRECT: redirectDestination, __N_SSP: true }
+      : { pageProps: customResponse.props, __N_SSP: true }
+  )
 
   const response: APIGatewayProxyResultV2 = {}
   response.statusCode = 200
-  response.body = JSON.stringify({ pageProps: customResponse.props })
+  response.body = body
   response.headers = {
     'Cache-Control': 'no-store',
   }
-  showDebugLogs && console.log({ response })
+  showDebugLogs && console.debug({ response })
 
   return response
 }
