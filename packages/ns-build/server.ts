@@ -51,7 +51,7 @@ const routeToRegex = (filePath: string) => {
   const regexPattern = relativePath
     .replace(/\/\[\[\.\.\.(\w+)\]\]/g, '(?:/(.*))?') // Handle [[...param]] correctly (no extra slash)
     .replace(/\[\.\.\.(\w+)\]/g, '/(.*)') // Handle [...param]
-    .replace(/\[(\w+)\]/g, '/([^/]+)') // Handle [param]
+    .replace(/\/?\[(\w+)\]/g, '/([^/]+)') // Handle [param]
 
   return {
     regex: new RegExp('^' + regexPattern + '$'),
@@ -60,6 +60,34 @@ const routeToRegex = (filePath: string) => {
     ].map(m => m[1] || m[2]),
     filePath,
   }
+}
+
+const depth = (path: string) => path.split('/').length // Count path depth
+const dynamicCount = (path: string) =>
+  (path.match(/\[([^\]]+)\]/g) || []).length // Count dynamic segments
+const isCatchAll = (path: string) => path.includes('[...')
+const isOptionalCatchAll = (path: string) => path.includes('[[...')
+
+const compareRoutes = (a: string, b: string) => {
+  // 1. Sort by absolute path depth (more nested = higher priority)
+  const depthDiff = depth(b) - depth(a) // Reverse order (deeper first)
+  if (depthDiff !== 0) return depthDiff
+
+  // 2. Fewer dynamic segments take priority
+  const dynamicDiff = dynamicCount(a) - dynamicCount(b)
+  if (dynamicDiff !== 0) return dynamicDiff
+
+  // 3. Catch-all `[...param]` has lower priority than `[param]`
+  const aCatchAll = isCatchAll(a)
+  const bCatchAll = isCatchAll(b)
+  if (aCatchAll !== bCatchAll) return aCatchAll ? 1 : -1
+
+  // 4. Optional catch-all `[[...param]]` has the lowest priority
+  const aOptionalCatchAll = isOptionalCatchAll(a)
+  const bOptionalCatchAll = isOptionalCatchAll(b)
+  if (aOptionalCatchAll !== bOptionalCatchAll) return aOptionalCatchAll ? 1 : -1
+
+  return 0 // Same priority
 }
 
 // Get all Next.js dynamic routes
@@ -81,7 +109,7 @@ const getAllNextRoutes = () => {
 
   traverse(dir)
 
-  return allFiles.map(routeToRegex)
+  return allFiles.sort((a, b) => compareRoutes(a, b)).map(routeToRegex)
 }
 
 // Match a request path to a known Next.js dynamic route
