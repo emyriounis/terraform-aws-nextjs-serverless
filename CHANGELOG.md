@@ -6,6 +6,10 @@ All notable changes to this project will be documented in this file.
 <!--  -->
 <!-- ## [Unreleased] -->
 
+## [v1.7.0] - 2025-04-10
+
+- Bugfix: SPA
+
 ## [v1.6.1] - 2025-03-20
 
 - Bugfix: SPA for dynamic routes
