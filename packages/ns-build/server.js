@@ -33,6 +33,19 @@ const showDebugLogs = process.env.SHOW_DEBUG_LOGS === 'true';
 // Check if the custom server-side props handler should be used.
 const useCustomServerSidePropsHandler = (path) => process.env.DEFAULT_SS_PROPS_HANDLER !== 'true' &&
     path.includes('/_next/data/');
+const parseCookies = (cookies = []) => {
+    const parsedCookies = {};
+    for (const cookie of cookies) {
+        const parts = cookie.split(';');
+        for (const part of parts) {
+            const [key, value] = part.split('=');
+            if (key && value) {
+                parsedCookies[key.trim()] = decodeURIComponent(value.trim());
+            }
+        }
+    }
+    return parsedCookies;
+};
 // Modify the event object to match the one expected by Next.JS
 const parseEvent = (event) => {
     const parsedEvent = Object.assign(event);
@@ -42,6 +55,10 @@ const parseEvent = (event) => {
         parsedEvent.headers['x-forwarded-proto'] +
             '://' +
             parsedEvent.headers['x-forwarded-host'];
+    const rawCookies = event.cookies;
+    Object.defineProperty(parsedEvent, 'cookies', {
+        get: () => parseCookies(rawCookies),
+    });
     return parsedEvent;
 };
 // Convert route file path to regex
@@ -168,10 +185,16 @@ const loadProps = (importPath) => __awaiter(void 0, void 0, void 0, function* ()
  */
 const getProps = (event) => __awaiter(void 0, void 0, void 0, function* () {
     var _c, _d;
-    const resolvedUrl = event.rawPath.replace('/_next/data/', '');
-    const path = './.next/server/pages/' +
-        resolvedUrl.split('/').slice(1).join('/').replace('.json', '.js');
-    showDebugLogs && console.debug({ path });
+    const routePath = '/' +
+        event.rawPath
+            .replace('/_next/data/', '')
+            .split('/')
+            .slice(1)
+            .join('/')
+            .replace('.json', '');
+    const path = './.next/server/pages' + routePath + '.js';
+    const resolvedUrl = routePath.replace('/index', '/');
+    showDebugLogs && console.debug({ routePath, path, resolvedUrl });
     /*
      * Dynamically import the module from the specified path and
      * extracts the `getServerSideProps` function from that module to load
@@ -181,7 +204,6 @@ const getProps = (event) => __awaiter(void 0, void 0, void 0, function* () {
     if (getServerSideProps === null) {
         return {
             statusCode: 404,
-            // statusCode: 200,
             body: JSON.stringify({ notFound: true }),
         };
     }
@@ -192,9 +214,18 @@ const getProps = (event) => __awaiter(void 0, void 0, void 0, function* () {
         params,
         resolvedUrl,
     };
+    showDebugLogs && console.debug({ customSsrContext });
     const customResponse = yield getServerSideProps(customSsrContext);
     showDebugLogs && console.debug({ customResponse });
     const redirectDestination = (_d = customResponse.redirect) === null || _d === void 0 ? void 0 : _d.destination;
+    showDebugLogs && console.debug({ redirectDestination });
+    // TODO: fix this
+    if (redirectDestination) {
+        return {
+            statusCode: 404,
+            body: JSON.stringify({ notFound: true }),
+        };
+    }
     const body = JSON.stringify(redirectDestination
         ? { __N_REDIRECT: redirectDestination, __N_SSP: true }
         : { pageProps: customResponse.props, __N_SSP: true });

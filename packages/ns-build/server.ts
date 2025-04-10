@@ -31,15 +31,40 @@ const useCustomServerSidePropsHandler = (path: string) =>
   process.env.DEFAULT_SS_PROPS_HANDLER !== 'true' &&
   path.includes('/_next/data/')
 
+const parseCookies = (cookies: string[] = []) => {
+  const parsedCookies: Record<string, string> = {}
+
+  for (const cookie of cookies) {
+    const parts = cookie.split(';')
+
+    for (const part of parts) {
+      const [key, value] = part.split('=')
+
+      if (key && value) {
+        parsedCookies[key.trim()] = decodeURIComponent(value.trim())
+      }
+    }
+  }
+
+  return parsedCookies
+}
+
 // Modify the event object to match the one expected by Next.JS
 const parseEvent = (event: APIGatewayProxyEventV2): ParsedEvent => {
   const parsedEvent: ParsedEvent = Object.assign(event)
+
   parsedEvent.path = parsedEvent.rawPath
   parsedEvent.headers.host = parsedEvent.headers['x-forwarded-host']
   parsedEvent.headers.referer =
     parsedEvent.headers['x-forwarded-proto'] +
     '://' +
     parsedEvent.headers['x-forwarded-host']
+
+  const rawCookies = event.cookies
+  Object.defineProperty(parsedEvent, 'cookies', {
+    get: () => parseCookies(rawCookies),
+  })
+
   return parsedEvent
 }
 
@@ -185,11 +210,17 @@ const loadProps = async (importPath: string) => {
  * serialized into a JSON string before being returned.
  */
 const getProps = async (event: ParsedEvent) => {
-  const resolvedUrl = event.rawPath.replace('/_next/data/', '')
-  const path =
-    './.next/server/pages/' +
-    resolvedUrl.split('/').slice(1).join('/').replace('.json', '.js')
-  showDebugLogs && console.debug({ path })
+  const routePath =
+    '/' +
+    event.rawPath
+      .replace('/_next/data/', '')
+      .split('/')
+      .slice(1)
+      .join('/')
+      .replace('.json', '')
+  const path = './.next/server/pages' + routePath + '.js'
+  const resolvedUrl = routePath.replace('/index', '/')
+  showDebugLogs && console.debug({ routePath, path, resolvedUrl })
 
   /*
    * Dynamically import the module from the specified path and
@@ -200,7 +231,6 @@ const getProps = async (event: ParsedEvent) => {
   if (getServerSideProps === null) {
     return {
       statusCode: 404,
-      // statusCode: 200,
       body: JSON.stringify({ notFound: true }),
     }
   }
@@ -212,10 +242,21 @@ const getProps = async (event: ParsedEvent) => {
     params,
     resolvedUrl,
   }
+  showDebugLogs && console.debug({ customSsrContext })
+
   const customResponse = await getServerSideProps(customSsrContext)
   showDebugLogs && console.debug({ customResponse })
 
   const redirectDestination = customResponse.redirect?.destination
+  showDebugLogs && console.debug({ redirectDestination })
+  // TODO: fix this
+  if (redirectDestination) {
+    return {
+      statusCode: 404,
+      body: JSON.stringify({ notFound: true }),
+    }
+  }
+
   const body = JSON.stringify(
     redirectDestination
       ? { __N_REDIRECT: redirectDestination, __N_SSP: true }
