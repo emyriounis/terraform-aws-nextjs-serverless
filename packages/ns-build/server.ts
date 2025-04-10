@@ -60,11 +60,6 @@ const parseEvent = (event: APIGatewayProxyEventV2): ParsedEvent => {
     '://' +
     parsedEvent.headers['x-forwarded-host']
 
-  const rawCookies = event.cookies
-  Object.defineProperty(parsedEvent, 'cookies', {
-    get: () => parseCookies(rawCookies),
-  })
-
   return parsedEvent
 }
 
@@ -335,7 +330,18 @@ export const handler = (
     return callback(null, response)
   }
 
-  return useCustomServerSidePropsHandler(parsedEvent.rawPath)
-    ? getProps(parsedEvent)
-    : main(parsedEvent, context)
+  const shouldUseCustomServerSidePropsHandler = useCustomServerSidePropsHandler(
+    parsedEvent.rawPath
+  )
+  if (shouldUseCustomServerSidePropsHandler) {
+    const rawCookies = event.cookies
+    Object.defineProperty(parsedEvent, 'cookies', {
+      get: () => parseCookies(rawCookies),
+    })
+    showDebugLogs && console.debug({ parsedEvent })
+
+    return getProps(parsedEvent)
+  }
+
+  return main(parsedEvent, context)
 }

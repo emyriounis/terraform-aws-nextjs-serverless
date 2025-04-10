@@ -55,10 +55,6 @@ const parseEvent = (event) => {
         parsedEvent.headers['x-forwarded-proto'] +
             '://' +
             parsedEvent.headers['x-forwarded-host'];
-    const rawCookies = event.cookies;
-    Object.defineProperty(parsedEvent, 'cookies', {
-        get: () => parseCookies(rawCookies),
-    });
     return parsedEvent;
 };
 // Convert route file path to regex
@@ -287,8 +283,15 @@ const handler = (event, context, callback) => {
         };
         return callback(null, response);
     }
-    return useCustomServerSidePropsHandler(parsedEvent.rawPath)
-        ? getProps(parsedEvent)
-        : main(parsedEvent, context);
+    const shouldUseCustomServerSidePropsHandler = useCustomServerSidePropsHandler(parsedEvent.rawPath);
+    if (shouldUseCustomServerSidePropsHandler) {
+        const rawCookies = event.cookies;
+        Object.defineProperty(parsedEvent, 'cookies', {
+            get: () => parseCookies(rawCookies),
+        });
+        showDebugLogs && console.debug({ parsedEvent });
+        return getProps(parsedEvent);
+    }
+    return main(parsedEvent, context);
 };
 exports.handler = handler;
