@@ -3,6 +3,7 @@
 ####################################
 
 module "image_optimization" {
+  count = var.enable_image_optimization ? 1 : 0
   providers = {
     aws = aws.global_region
   }
@@ -50,6 +51,7 @@ module "image_optimization" {
 ####################################
 
 module "image_redirection" {
+  count = var.enable_image_optimization ? 1 : 0
   providers = {
     aws = aws.global_region
   }

@@ -25,3 +25,7 @@ variable "image_optimization_lambda_memory_size" {
 variable "image_optimization_ephemeral_storage_size" {
   type = number
 }
+
+variable "enable_image_optimization" {
+  type = bool
+}

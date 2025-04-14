@@ -42,6 +42,7 @@ module "image-optimization" {
   deployment_name = var.deployment_name
   base_dir        = var.base_dir
 
+  enable_image_optimization                 = var.enable_image_optimization
   image_optimization_runtime                = var.image_optimization_runtime
   image_optimization_logs_retention         = var.image_optimization_logs_retention
   image_optimization_lambda_memory_size     = var.image_optimization_lambda_memory_size
@@ -63,8 +64,8 @@ module "distribution" {
   dynamic_origin_domain_name = module.server-side-rendering.api_gateway.default_apigatewayv2_stage_domain_name
 
   enable_image_optimization        = var.enable_image_optimization
-  image_optimization_qualified_arn = module.image-optimization.image_optimization.lambda_function_qualified_arn
-  image_redirection_qualified_arn  = module.image-optimization.image_redirection.lambda_function_qualified_arn
+  image_optimization_qualified_arn = var.enable_image_optimization ? module.image-optimization.image_optimization.lambda_function_qualified_arn[0] : null
+  image_redirection_qualified_arn  = var.enable_image_optimization ? module.image-optimization.image_redirection.lambda_function_qualified_arn[0] : null
 
   cloudfront_acm_certificate_arn = var.cloudfront_acm_certificate_arn
   cloudfront_aliases             = var.cloudfront_aliases

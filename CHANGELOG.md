@@ -6,6 +6,10 @@ All notable changes to this project will be documented in this file.
 <!--  -->
 <!-- ## [Unreleased] -->
 
+## [v2.0.0] - 2025-04-14
+
+- Conditionally create Image optimization and redirection lambdas
+
 ## [v1.7.1] - 2025-04-11
 
 - Bugfix: SPA (followup)

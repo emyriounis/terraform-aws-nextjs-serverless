@@ -11,10 +11,12 @@ resource "aws_cloudfront_origin_access_identity" "dynamic_assets_oai" {
 }
 
 resource "aws_cloudfront_origin_access_identity" "image_redirection_oai" {
+  count   = var.enable_image_optimization ? 1 : 0
   comment = "image_redirection_origin"
 }
 
 resource "aws_cloudfront_origin_access_identity" "image_optimization_oai" {
+  count   = var.enable_image_optimization ? 1 : 0
   comment = "image_optimization_origin"
 }
 
@@ -123,42 +125,48 @@ resource "aws_cloudfront_distribution" "next_distribution" {
     }
   }
 
-  origin {
-    domain_name = "example.com"
-    origin_id   = aws_cloudfront_origin_access_identity.image_redirection_oai.id
+  dynamic "origin" {
+    for_each = var.enable_image_optimization ? [1] : []
+    content {
+      domain_name = "example.com"
+      origin_id   = aws_cloudfront_origin_access_identity.image_redirection_oai[0].id
 
-    custom_origin_config {
-      http_port              = "80"
-      https_port             = "443"
-      origin_protocol_policy = "https-only"
-      origin_ssl_protocols   = ["TLSv1.2"]
-    }
+      custom_origin_config {
+        http_port              = "80"
+        https_port             = "443"
+        origin_protocol_policy = "https-only"
+        origin_ssl_protocols   = ["TLSv1.2"]
+      }
 
-    custom_header {
-      name  = "Enable-Image-Optimization"
-      value = var.enable_image_optimization ? "true" : "false"
+      custom_header {
+        name  = "Enable-Image-Optimization"
+        value = "true"
+      }
     }
   }
 
-  origin {
-    domain_name = "example.com"
-    origin_id   = aws_cloudfront_origin_access_identity.image_optimization_oai.id
+  dynamic "origin" {
+    for_each = var.enable_image_optimization ? [1] : []
+    content {
+      domain_name = "example.com"
+      origin_id   = aws_cloudfront_origin_access_identity.image_optimization_oai[0].id
 
-    custom_origin_config {
-      http_port              = "80"
-      https_port             = "443"
-      origin_protocol_policy = "https-only"
-      origin_ssl_protocols   = ["TLSv1.2"]
-    }
+      custom_origin_config {
+        http_port              = "80"
+        https_port             = "443"
+        origin_protocol_policy = "https-only"
+        origin_ssl_protocols   = ["TLSv1.2"]
+      }
 
-    custom_header {
-      name  = "S3-Region"
-      value = var.public_assets_bucket_region
-    }
+      custom_header {
+        name  = "S3-Region"
+        value = var.public_assets_bucket_region
+      }
 
-    custom_header {
-      name  = "Public-Assets-Bucket"
-      value = var.public_assets_bucket.s3_bucket_id
+      custom_header {
+        name  = "Public-Assets-Bucket"
+        value = var.public_assets_bucket.s3_bucket_id
+      }
     }
   }
 
@@ -169,39 +177,45 @@ resource "aws_cloudfront_distribution" "next_distribution" {
   aliases             = var.cloudfront_aliases
   default_root_object = null
 
-  ordered_cache_behavior {
-    path_pattern     = "/_next/image/*"
-    allowed_methods  = ["GET", "HEAD", "OPTIONS"]
-    cached_methods   = ["GET", "HEAD", "OPTIONS"]
-    target_origin_id = aws_cloudfront_origin_access_identity.image_optimization_oai.id
+  dynamic "ordered_cache_behavior" {
+    for_each = var.enable_image_optimization ? [1] : []
+    content {
+      path_pattern     = "/_next/image/*"
+      allowed_methods  = ["GET", "HEAD", "OPTIONS"]
+      cached_methods   = ["GET", "HEAD", "OPTIONS"]
+      target_origin_id = aws_cloudfront_origin_access_identity.image_optimization_oai[0].id
 
-    lambda_function_association {
-      event_type = "origin-request"
-      lambda_arn = var.image_optimization_qualified_arn
+      lambda_function_association {
+        event_type = "origin-request"
+        lambda_arn = var.image_optimization_qualified_arn
+      }
+
+      cache_policy_id = data.aws_cloudfront_cache_policy.caching_optimized.id
+
+      viewer_protocol_policy = "redirect-to-https"
+      compress               = true
     }
-
-    cache_policy_id = data.aws_cloudfront_cache_policy.caching_optimized.id
-
-    viewer_protocol_policy = "redirect-to-https"
-    compress               = true
   }
 
-  ordered_cache_behavior {
-    path_pattern     = "/_next/image*"
-    allowed_methods  = ["GET", "HEAD", "OPTIONS"]
-    cached_methods   = ["GET", "HEAD", "OPTIONS"]
-    target_origin_id = aws_cloudfront_origin_access_identity.image_redirection_oai.id
+  dynamic "ordered_cache_behavior" {
+    for_each = var.enable_image_optimization ? [1] : []
+    content {
+      path_pattern     = "/_next/image*"
+      allowed_methods  = ["GET", "HEAD", "OPTIONS"]
+      cached_methods   = ["GET", "HEAD", "OPTIONS"]
+      target_origin_id = aws_cloudfront_origin_access_identity.image_redirection_oai[0].id
 
-    lambda_function_association {
-      event_type   = "viewer-request"
-      lambda_arn   = var.image_redirection_qualified_arn
-      include_body = true
+      lambda_function_association {
+        event_type   = "viewer-request"
+        lambda_arn   = var.image_redirection_qualified_arn
+        include_body = true
+      }
+
+      cache_policy_id = data.aws_cloudfront_cache_policy.caching_optimized.id
+
+      viewer_protocol_policy = "redirect-to-https"
+      compress               = true
     }
-
-    cache_policy_id = data.aws_cloudfront_cache_policy.caching_optimized.id
-
-    viewer_protocol_policy = "redirect-to-https"
-    compress               = true
   }
 
   ordered_cache_behavior {

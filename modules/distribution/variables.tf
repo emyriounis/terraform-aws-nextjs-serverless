@@ -28,11 +28,13 @@ variable "cloudfront_aliases" {
 }
 
 variable "image_optimization_qualified_arn" {
-  type = string
+  type    = string
+  default = null
 }
 
 variable "image_redirection_qualified_arn" {
-  type = string
+  type    = string
+  default = null
 }
 
 variable "static_assets_bucket" {
