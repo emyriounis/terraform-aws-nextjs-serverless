@@ -71,6 +71,7 @@ module "distribution" {
   cloudfront_price_class         = var.cloudfront_price_class
 
   cloudfront_cached_paths      = var.cloudfront_cached_paths
+  custom_cache_policy_id       = var.custom_cache_policy_id
   cloudfront_cache_default_ttl = var.cloudfront_cache_default_ttl
   cloudfront_cache_max_ttl     = var.cloudfront_cache_max_ttl
   cloudfront_cache_min_ttl     = var.cloudfront_cache_min_ttl
