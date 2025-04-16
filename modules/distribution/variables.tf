@@ -64,6 +64,10 @@ variable "cloudfront_cached_paths" {
   })
 }
 
+variable "custom_cache_policy_id" {
+  type = string
+}
+
 variable "cloudfront_cache_default_ttl" {
   type = number
 }

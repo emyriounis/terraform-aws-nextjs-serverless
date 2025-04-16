@@ -6,6 +6,14 @@ All notable changes to this project will be documented in this file.
 <!--  -->
 <!-- ## [Unreleased] -->
 
+## [v1.8.0] - 2025-04-16
+
+- Use AWS-managed cache policies
+- Drop `referrer` in favor of `host`
+- Switch `301` to `302`
+- Add `viewer-request` cloudfront function to the distribution
+- Add `custom_cache_policy_id` tf variable
+
 ## [v1.7.1] - 2025-04-11
 
 - Bugfix: SPA (followup)

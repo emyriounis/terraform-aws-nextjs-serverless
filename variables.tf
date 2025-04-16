@@ -133,6 +133,12 @@ variable "cloudfront_cached_paths" {
   }
 }
 
+variable "custom_cache_policy_id" {
+  description = "The ID of CloudFront cache policy"
+  type        = string
+  default     = null
+}
+
 variable "cloudfront_cache_default_ttl" {
   description = "Default TTL in seconds for ordered cache behaviors"
   type        = number

@@ -2,6 +2,14 @@ data "aws_cloudfront_cache_policy" "caching_optimized" {
   name = "Managed-CachingOptimized"
 }
 
+data "aws_cloudfront_cache_policy" "caching_disabled" {
+  name = "Managed-CachingDisabled"
+}
+
+data "aws_cloudfront_origin_request_policy" "caching_all_viewer_except_host_header" {
+  name = "Managed-AllViewerExceptHostHeader"
+}
+
 ####################################
 ############ lambdas_oai ###########
 ####################################
@@ -22,34 +30,38 @@ resource "aws_cloudfront_origin_access_identity" "image_optimization_oai" {
 ########### distribution ###########
 ####################################
 
-resource "aws_cloudfront_cache_policy" "next_distribution" {
-  name = "${var.deployment_name}-next-distribution-cache-policy"
+resource "aws_cloudfront_function" "viewer_request" {
+  name    = "${var.deployment_name}-ssr-viewer-request"
+  runtime = "cloudfront-js-2.0"
+  comment = "cloudfront function to extract custom domain"
+  publish = true
+  code    = <<EOF
+const imageTypes = ['webp', 'jpeg', 'jpg', 'png', 'gif', 'ico', 'svg'];
 
-  default_ttl = var.cloudfront_cache_default_ttl
-  max_ttl     = var.cloudfront_cache_max_ttl
-  min_ttl     = var.cloudfront_cache_min_ttl
+function handler(event) {
+  const request = event.request;
+  const uri = event.request.uri;
+  const headers = request.headers;
+  const host = request.headers.host.value;
 
-  parameters_in_cache_key_and_forwarded_to_origin {
-    cookies_config {
-      cookie_behavior = "all"
-    }
-    headers_config {
-      header_behavior = "whitelist"
-      headers {
-        items = ["x-forwarded-host"]
-      }
-    }
-    query_strings_config {
-      query_string_behavior = "all"
-    }
+  if (uri && imageTypes.some((type) => uri.includes('.' + type))) {
+    const response = {
+      statusCode: 302,
+      // Don't use `host` as it's not custom domain
+      headers: { location: { value: '/assets' + uri } },
+    };
 
-    enable_accept_encoding_brotli = true
-    enable_accept_encoding_gzip   = true
+    return response;
   }
+
+  headers['x-forwarded-host'] = { value: host };
+  return request;
+}
+EOF
 }
 
 resource "aws_cloudfront_cache_policy" "custom_paths_cache" {
-  count = length(var.cloudfront_cached_paths.paths) > 0 ? 1 : 0
+  count = var.custom_cache_policy_id == null && length(var.cloudfront_cached_paths.paths) > 0 ? 1 : 0
   name  = "${var.deployment_name}-custom-paths-cache-policy"
 
   default_ttl = var.cloudfront_cached_paths.default_ttl
@@ -72,23 +84,6 @@ resource "aws_cloudfront_cache_policy" "custom_paths_cache" {
 
     enable_accept_encoding_brotli = true
     enable_accept_encoding_gzip   = true
-  }
-}
-
-resource "aws_cloudfront_origin_request_policy" "next_distribution" {
-  name = "${var.deployment_name}-next-distribution-origin-request-policy"
-
-  cookies_config {
-    cookie_behavior = "all"
-  }
-  headers_config {
-    header_behavior = "whitelist"
-    headers {
-      items = ["x-forwarded-host"]
-    }
-  }
-  query_strings_config {
-    query_string_behavior = "all"
   }
 }
 
@@ -248,7 +243,7 @@ resource "aws_cloudfront_distribution" "next_distribution" {
       cached_methods   = ["GET", "HEAD", "OPTIONS"]
       target_origin_id = aws_cloudfront_origin_access_identity.dynamic_assets_oai.id
 
-      cache_policy_id = aws_cloudfront_cache_policy.custom_paths_cache[0].id
+      cache_policy_id = var.custom_cache_policy_id != null ? var.custom_cache_policy_id : aws_cloudfront_cache_policy.custom_paths_cache[0].id
 
       dynamic "function_association" {
         for_each = var.cloudfront_function_associations
@@ -268,11 +263,11 @@ resource "aws_cloudfront_distribution" "next_distribution" {
     cached_methods   = ["GET", "HEAD"]
     target_origin_id = aws_cloudfront_origin_access_identity.dynamic_assets_oai.id
 
-    cache_policy_id          = aws_cloudfront_cache_policy.next_distribution.id
-    origin_request_policy_id = aws_cloudfront_origin_request_policy.next_distribution.id
+    cache_policy_id          = data.aws_cloudfront_cache_policy.caching_disabled.id
+    origin_request_policy_id = data.aws_cloudfront_origin_request_policy.caching_all_viewer_except_host_header.id
 
     dynamic "function_association" {
-      for_each = var.cloudfront_function_associations
+      for_each = concat([{ event_type : "viewer-request", function_arn : aws_cloudfront_function.viewer_request.arn }], var.cloudfront_function_associations)
       content {
         event_type   = function_association.value.event_type
         function_arn = function_association.value.function_arn

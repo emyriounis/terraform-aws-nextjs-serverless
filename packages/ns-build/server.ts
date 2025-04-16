@@ -55,10 +55,6 @@ const parseEvent = (event: APIGatewayProxyEventV2): ParsedEvent => {
 
   parsedEvent.path = parsedEvent.rawPath
   parsedEvent.headers.host = parsedEvent.headers['x-forwarded-host']
-  parsedEvent.headers.referer =
-    parsedEvent.headers['x-forwarded-proto'] +
-    '://' +
-    parsedEvent.headers['x-forwarded-host']
 
   return parsedEvent
 }
@@ -321,9 +317,10 @@ export const handler = (
   /* If an image is requested, redirect to the corresponding S3 bucket. */
   if (imageTypes.some(type => parsedEvent.path.includes('.' + type))) {
     const response = {
-      statusCode: 301,
+      statusCode: 302,
       headers: {
-        Location: parsedEvent.headers.referer + '/assets' + parsedEvent.path,
+        Location:
+          'https://' + parsedEvent.headers.host + '/assets' + parsedEvent.path,
       },
     }
 
