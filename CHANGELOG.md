@@ -6,6 +6,10 @@ All notable changes to this project will be documented in this file.
 <!--  -->
 <!-- ## [Unreleased] -->
 
+## [v1.8.1] - 2025-04-22
+
+- Bugfix: cached paths
+
 ## [v1.8.0] - 2025-04-16
 
 - Use AWS-managed cache policies

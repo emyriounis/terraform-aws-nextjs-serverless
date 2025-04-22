@@ -246,7 +246,7 @@ resource "aws_cloudfront_distribution" "next_distribution" {
       cache_policy_id = var.custom_cache_policy_id != null ? var.custom_cache_policy_id : aws_cloudfront_cache_policy.custom_paths_cache[0].id
 
       dynamic "function_association" {
-        for_each = var.cloudfront_function_associations
+        for_each = concat([{ event_type : "viewer-request", function_arn : aws_cloudfront_function.viewer_request.arn }], var.cloudfront_function_associations)
         content {
           event_type   = function_association.value.event_type
           function_arn = function_association.value.function_arn

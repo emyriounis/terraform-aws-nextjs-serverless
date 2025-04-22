@@ -162,6 +162,8 @@ const loadProps = (importPath) => __awaiter(void 0, void 0, void 0, function* ()
                     console.debug(`Fallback failed for ${matchedRoute.filePath}`, fallbackErr);
             }
         }
+        showDebugLogs &&
+            console.debug(`Failed to match dynamic route for ${requestPath}`);
         return { getServerSideProps: null };
     }
 });
@@ -195,7 +197,7 @@ const getProps = (event) => __awaiter(void 0, void 0, void 0, function* () {
     const { getServerSideProps, params } = yield loadProps(path);
     if (getServerSideProps === null) {
         return {
-            statusCode: 404,
+            statusCode: 500,
             body: JSON.stringify({ notFound: true }),
         };
     }
@@ -214,7 +216,7 @@ const getProps = (event) => __awaiter(void 0, void 0, void 0, function* () {
     // TODO: fix this
     if (redirectDestination) {
         return {
-            statusCode: 404,
+            statusCode: 500,
             body: JSON.stringify({ notFound: true }),
         };
     }

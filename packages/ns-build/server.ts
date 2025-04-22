@@ -186,6 +186,9 @@ const loadProps = async (importPath: string) => {
           )
       }
     }
+
+    showDebugLogs &&
+      console.debug(`Failed to match dynamic route for ${requestPath}`)
     return { getServerSideProps: null }
   }
 }
@@ -221,7 +224,7 @@ const getProps = async (event: ParsedEvent) => {
   const { getServerSideProps, params } = await loadProps(path)
   if (getServerSideProps === null) {
     return {
-      statusCode: 404,
+      statusCode: 500,
       body: JSON.stringify({ notFound: true }),
     }
   }
@@ -243,7 +246,7 @@ const getProps = async (event: ParsedEvent) => {
   // TODO: fix this
   if (redirectDestination) {
     return {
-      statusCode: 404,
+      statusCode: 500,
       body: JSON.stringify({ notFound: true }),
     }
   }
