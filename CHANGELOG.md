@@ -8,8 +8,8 @@ All notable changes to this project will be documented in this file.
 
 ## [v2.0.0] - 2025-12-04
 
-- Pump default nodejs runtime to v22
-- Support next.js v15
+- Bump default nodejs runtime to v22
+- Support Next.js v15
 
 ## [v1.8.1] - 2025-04-22
 
@@ -92,7 +92,7 @@ All notable changes to this project will be documented in this file.
 - Mark `next` as peer dependency
 - Silence zip process
 - Remove `app/` route example
-- pump version
+- Bump version
 
 ## [v1.0.0] - 2024-05-15
 
@@ -100,7 +100,7 @@ All notable changes to this project will be documented in this file.
 
 ## [v0.4.6] - 2024-05-15
 
-- Pump default nodejs runtime to v18
+- Bump default nodejs runtime to v18
 - Completely disable caching for ssr paths
 - Fix redirect issue for public assets
 
@@ -161,7 +161,7 @@ All notable changes to this project will be documented in this file.
 Updates:
 
 - Rename SSR Lambda
-- Pump default nodejs runtime to v18
+- Bump default nodejs runtime to v18
 
 **Breaking Changes**
 
