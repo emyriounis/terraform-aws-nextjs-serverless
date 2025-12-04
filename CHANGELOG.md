@@ -6,6 +6,11 @@ All notable changes to this project will be documented in this file.
 <!--  -->
 <!-- ## [Unreleased] -->
 
+## [v2.0.0] - 2025-12-04
+
+- Pump default nodejs runtime to v22
+- Support next.js v15
+
 ## [v1.8.1] - 2025-04-22
 
 - Bugfix: cached paths

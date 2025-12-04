@@ -7,9 +7,9 @@ resource "aws_cloudfront_function" "test" {
 }
 
 module "next_serverless" {
-  # source = "../../../"
-  source  = "emyriounis/nextjs-serverless/aws"
-  version = "1.8.1"
+  source = "../../../"
+  # source  = "emyriounis/nextjs-serverless/aws"
+  # version = "2.0.0"
 
   providers = {
     aws.global_region = aws.global_region
@@ -22,15 +22,10 @@ module "next_serverless" {
   cloudfront_acm_certificate_arn = (var.deployment_domain != null) ? module.next_cloudfront_certificate[0].acm_certificate_arn : null
   cloudfront_aliases             = (var.deployment_domain != null) ? [var.deployment_domain] : []
 
-  pre_resize_images                     = true
+  pre_resize_images                     = false
   wait_for_distribution_deployment      = false
   show_debug_logs                       = true
   use_default_server_side_props_handler = false
-
-  cloudfront_function_associations = [{
-    event_type   = "viewer-request"
-    function_arn = aws_cloudfront_function.test.arn
-  }]
 
   next_lambda_env_vars = {
     NODE_ENV = "production"
