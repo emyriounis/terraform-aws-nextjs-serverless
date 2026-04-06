@@ -49,7 +49,7 @@ Please check our [testing guidelines](https://github.com/emyriounis/terraform-aw
 ```diff
 module "tf_next" {
 - source  = "emyriounis/nextjs-serverless/aws"
-- version = "3.0.1"
+- version = "3.0.2"
 + source = "../../../"
   ...
 }

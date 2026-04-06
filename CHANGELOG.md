@@ -6,7 +6,7 @@ All notable changes to this project will be documented in this file.
 <!--  -->
 <!-- ## [Unreleased] -->
 
-## [v3.0.1] - 2026-04-06
+## [v3.0.2] - 2026-04-06
 
 **Breaking Changes**
 
