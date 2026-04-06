@@ -10,6 +10,7 @@ All notable changes to this project will be documented in this file.
 
 **Breaking Changes**
 
+- Bump AWS provider to ~6.0
 - Bump default nodejs runtime to v24
 
 ## [v2.2.0] - 2026-04-01
