@@ -257,16 +257,12 @@ const main = (0, serverless_http_1.default)(nextServer.getRequestHandler(), {
  * provide information about the execution environment and runtime context of the function. It can
  * include details such as the AWS Lambda function name, version, memory limit, request ID, and more.
  * This information can be useful for understanding the context
- * @param {Callback} callback - The `callback` parameter in the `handler` function is a function that you
- * can call to send a response back to the caller. In this case, the response is an HTTP response
- * object that includes a status code and headers. When you call `callback(null, response)`, you are
- * indicating that
  * @returns The code is returning either the result of the `getProps(parsedEvent)` function if
  * `useCustomServerSidePropsHandler(parsedEvent.rawPath)` returns true, or the result of the
  * `main(parsedEvent, context)` function if `useCustomServerSidePropsHandler(parsedEvent.rawPath)`
  * returns false.
  */
-const handler = (event, context, callback) => {
+const handler = (event, context) => {
     showDebugLogs && console.debug({ event });
     showDebugLogs && console.debug({ context });
     const parsedEvent = parseEvent(event);
@@ -279,7 +275,7 @@ const handler = (event, context, callback) => {
                 Location: 'https://' + parsedEvent.headers.host + '/assets' + parsedEvent.path,
             },
         };
-        return callback(null, response);
+        return response;
     }
     const shouldUseCustomServerSidePropsHandler = useCustomServerSidePropsHandler(parsedEvent.rawPath);
     if (shouldUseCustomServerSidePropsHandler) {

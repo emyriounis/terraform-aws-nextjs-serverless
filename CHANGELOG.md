@@ -6,6 +6,12 @@ All notable changes to this project will be documented in this file.
 <!--  -->
 <!-- ## [Unreleased] -->
 
+## [v3.0.0] - 2026-04-06
+
+**Breaking Changes**
+
+- Bump default nodejs runtime to v24
+
 ## [v2.2.0] - 2026-04-01
 
 - Support Next.js v16
