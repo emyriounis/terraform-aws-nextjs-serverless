@@ -66,7 +66,7 @@ variable "next_lambda_memory_size" {
 variable "next_lambda_runtime" {
   description = "The runtime for the next lambda"
   type        = string
-  default     = "nodejs22.x"
+  default     = "nodejs24.x"
 }
 
 variable "next_lambda_logs_retention" {
@@ -96,7 +96,7 @@ variable "enable_image_optimization" {
 variable "image_optimization_runtime" {
   description = "The runtime for the image optimization Lambdas"
   type        = string
-  default     = "nodejs22.x"
+  default     = "nodejs24.x"
 }
 
 variable "image_optimization_lambda_memory_size" {

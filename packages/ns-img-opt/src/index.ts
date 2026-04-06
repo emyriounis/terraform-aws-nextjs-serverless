@@ -23,7 +23,7 @@ import { isVersionStored, redirectTo } from './helpers'
  * body encoding, and
  * @returns The code is returning a response object with the following properties:
  */
-export const handler = async (event: any, _context: any, callback: any) => {
+export const handler = async (event: any, _context: any) => {
   try {
     /* Extract the `request` and `config` properties. */
     const { request, config } = event?.Records?.[0]?.cf
@@ -51,9 +51,13 @@ export const handler = async (event: any, _context: any, callback: any) => {
     const s3 = new S3Client({ region: s3Region })
     const resizedImageFilename = `resized-assets/${width}/${type}/${filename}`
 
-    const isVersionAlreadyResized = await isVersionStored(s3, publicAssetsBucket, resizedImageFilename)
+    const isVersionAlreadyResized = await isVersionStored(
+      s3,
+      publicAssetsBucket,
+      resizedImageFilename,
+    )
     if (isVersionAlreadyResized) {
-      return redirectTo(baseUrl + resizedImageFilename, callback)
+      return redirectTo(baseUrl + resizedImageFilename)
     }
 
     // The url where the image is stored
@@ -110,7 +114,7 @@ export const handler = async (event: any, _context: any, callback: any) => {
       // //   break
 
       default:
-        return redirectTo(imageUrl, callback)
+        return redirectTo(imageUrl)
     }
 
     /* Converting the resized image into a buffer. */
@@ -124,12 +128,12 @@ export const handler = async (event: any, _context: any, callback: any) => {
     })
     await s3.send(s3PutObjectCommand)
 
-    return redirectTo(baseUrl + resizedImageFilename, callback)
+    return redirectTo(baseUrl + resizedImageFilename)
   } catch (error) {
     console.error('An unexpected occured', error)
 
-    return callback(null, {
+    return {
       status: 403, // to not leak data
-    })
+    }
   }
 }

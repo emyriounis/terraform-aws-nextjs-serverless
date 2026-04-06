@@ -137,15 +137,18 @@ const matchRoute = (requestPath: string) => {
     showDebugLogs && console.debug({ requestPath, regex, paramNames, filePath })
     const match = requestPath.match(regex)
     if (match) {
-      const params = paramNames.reduce((acc, param, i) => {
-        const value = match[i + 1] ? match[i + 1].split('/') : undefined
+      const params = paramNames.reduce(
+        (acc, param, i) => {
+          const value = match[i + 1] ? match[i + 1].split('/') : undefined
 
-        if (value && value.length === 1) {
-          acc[param] = value[0]
-        }
+          if (value && value.length === 1) {
+            acc[param] = value[0]
+          }
 
-        return acc
-      }, {} as Record<string, string | string[] | undefined>)
+          return acc
+        },
+        {} as Record<string, string | string[] | undefined>,
+      )
 
       return { filePath, params }
     }
@@ -162,7 +165,7 @@ const loadProps = async (importPath: string) => {
     showDebugLogs &&
       console.debug(
         `Failed to directly load ${importPath}, trying dynamic route match...`,
-        err
+        err,
       )
     // Extract the request path from the import path
     const requestPath = importPath
@@ -182,7 +185,7 @@ const loadProps = async (importPath: string) => {
         showDebugLogs &&
           console.debug(
             `Fallback failed for ${matchedRoute.filePath}`,
-            fallbackErr
+            fallbackErr,
           )
       }
     }
@@ -254,7 +257,7 @@ const getProps = async (event: ParsedEvent) => {
   const body = JSON.stringify(
     redirectDestination
       ? { __N_REDIRECT: redirectDestination, __N_SSP: true }
-      : { pageProps: customResponse.props, __N_SSP: true }
+      : { pageProps: customResponse.props, __N_SSP: true },
   )
 
   const response: APIGatewayProxyResultV2 = {}
@@ -297,20 +300,12 @@ const main = serverless(nextServer.getRequestHandler(), {
  * provide information about the execution environment and runtime context of the function. It can
  * include details such as the AWS Lambda function name, version, memory limit, request ID, and more.
  * This information can be useful for understanding the context
- * @param {Callback} callback - The `callback` parameter in the `handler` function is a function that you
- * can call to send a response back to the caller. In this case, the response is an HTTP response
- * object that includes a status code and headers. When you call `callback(null, response)`, you are
- * indicating that
  * @returns The code is returning either the result of the `getProps(parsedEvent)` function if
  * `useCustomServerSidePropsHandler(parsedEvent.rawPath)` returns true, or the result of the
  * `main(parsedEvent, context)` function if `useCustomServerSidePropsHandler(parsedEvent.rawPath)`
  * returns false.
  */
-export const handler = (
-  event: APIGatewayProxyEventV2,
-  context: Context,
-  callback: Callback
-) => {
+export const handler = (event: APIGatewayProxyEventV2, context: Context) => {
   showDebugLogs && console.debug({ event })
   showDebugLogs && console.debug({ context })
 
@@ -327,11 +322,11 @@ export const handler = (
       },
     }
 
-    return callback(null, response)
+    return response
   }
 
   const shouldUseCustomServerSidePropsHandler = useCustomServerSidePropsHandler(
-    parsedEvent.rawPath
+    parsedEvent.rawPath,
   )
   if (shouldUseCustomServerSidePropsHandler) {
     const rawCookies = event.cookies

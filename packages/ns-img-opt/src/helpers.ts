@@ -1,15 +1,12 @@
-import { HeadObjectCommand, S3Client } from "@aws-sdk/client-s3"
+import { HeadObjectCommand, S3Client } from '@aws-sdk/client-s3'
 
 /**
  * The function `redirectTo` is used to create a redirect response with a specified URL.
  * @param {string} url - The `url` parameter is a string that represents the URL to which you want to
  * redirect the user.
- * @param {any} callback - The `callback` parameter is a function that is used to return the response
- * to the caller. It takes two arguments: an error object (if any) and the response object. In this
- * case, the response object is an HTTP response with a status code of 302 (Redirect) and a `
  * @returns a callback function with two arguments: null and an object representing a response.
  */
-export const redirectTo = (url: string, callback: any) => {
+export const redirectTo = (url: string) => {
   const response = {
     status: 302,
     statusDescription: 'Redirect',
@@ -29,10 +26,14 @@ export const redirectTo = (url: string, callback: any) => {
     },
   }
 
-  return callback(null, response)
+  return response
 }
 
-export const isVersionStored = async (s3Client: S3Client, bucket: string, key: string): Promise<boolean> => {
+export const isVersionStored = async (
+  s3Client: S3Client,
+  bucket: string,
+  key: string,
+): Promise<boolean> => {
   try {
     const command = new HeadObjectCommand({
       Bucket: bucket,
@@ -43,7 +44,7 @@ export const isVersionStored = async (s3Client: S3Client, bucket: string, key: s
     await s3Client.send(command)
     return true
   } catch (error) {
-    console.warn(`${key} is not stored yet`, error);
+    console.warn(`${key} is not stored yet`, error)
     return false
   }
 }
