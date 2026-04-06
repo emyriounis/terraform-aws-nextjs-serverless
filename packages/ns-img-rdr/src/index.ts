@@ -43,7 +43,7 @@ const mapImageWidth = (requestedWidth: string): string => {
  * case, the response object is an HTTP response with a status code of 302 (Redirect) and a `
  * @returns a callback function with two arguments: null and an object representing a response.
  */
-const redirectTo = (url: string, callback: any) => {
+const redirectTo = (url: string) => {
   const response = {
     status: 302,
     statusDescription: 'Redirect',
@@ -63,7 +63,7 @@ const redirectTo = (url: string, callback: any) => {
     },
   }
 
-  return callback(null, response)
+  return response
 }
 
 /**
@@ -83,7 +83,7 @@ const redirectTo = (url: string, callback: any) => {
  * to the caller, such
  * @returns The code is returning a redirect response to a specified URL.
  */
-export const handler = async (event: any, _context: any, callback: any) => {
+export const handler = async (event: any, _context: any) => {
   try {
     /* Extract the `request` and `config` properties. */
     const { request, config } = event?.Records?.[0]?.cf
@@ -99,7 +99,7 @@ export const handler = async (event: any, _context: any, callback: any) => {
           ...acc,
           [q[0]]: q[1],
         }),
-        {}
+        {},
       )
 
     // Return original image if it's remote image
@@ -107,7 +107,7 @@ export const handler = async (event: any, _context: any, callback: any) => {
       /* The URL for the original image. */
       const imageUrl = query.url.replace(/%3A/g, ':').replace(/%2F/g, '/')
       console.log({ imageUrl })
-      return redirectTo(imageUrl, callback)
+      return redirectTo(imageUrl)
     }
 
     // Return original image if it's static image
@@ -117,13 +117,14 @@ export const handler = async (event: any, _context: any, callback: any) => {
         'https://' +
         config?.distributionDomainName +
         query.url.replace(/%2F/g, '/')
-      return redirectTo(imageUrl, callback)
+      return redirectTo(imageUrl)
     }
 
     // Return original image if it's image/gif or image/svg+xml
     // OR is the feature is disabled
     const isFeatureEnabled =
-      request?.origin?.custom?.customHeaders?.['enable-image-optimization']?.[0]?.value === 'true'
+      request?.origin?.custom?.customHeaders?.['enable-image-optimization']?.[0]
+        ?.value === 'true'
     const regex = /\.(gif|svg|xml)$/
     if (regex.test(query.url) || !isFeatureEnabled) {
       /* The URL for the original image. */
@@ -132,12 +133,12 @@ export const handler = async (event: any, _context: any, callback: any) => {
         config?.distributionDomainName +
         '/assets' +
         query.url.replace(/%2F/g, '/')
-      return redirectTo(imageUrl, callback)
+      return redirectTo(imageUrl)
     }
 
     /* Extract the value of the "accept" header from the request headers. */
     const acceptHeader: string = request?.headers?.accept?.find(
-      (item: Record<string, string>) => item.key === 'accept'
+      (item: Record<string, string>) => item.key === 'accept',
     )?.value
     /* Create a list with accepted image types. */
     const acceptedTypes = acceptHeader
@@ -167,12 +168,12 @@ export const handler = async (event: any, _context: any, callback: any) => {
       .replace(/%2F/g, '/')
       .replace('/assets', '')
 
-    return redirectTo(redirectToUrl, callback)
+    return redirectTo(redirectToUrl)
   } catch (error) {
     console.error({ error })
 
-    return callback(null, {
+    return {
       status: 403, // to not leak data
-    })
+    }
   }
 }
