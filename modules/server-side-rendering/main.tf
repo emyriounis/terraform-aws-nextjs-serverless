@@ -15,7 +15,7 @@ locals {
 
 module "next_lambda_zips_bucket" {
   source  = "terraform-aws-modules/s3-bucket/aws"
-  version = "3.15.1"
+  version = "5.12.0"
 
   bucket                   = "${var.deployment_name}-next-lambda-zips"
   acl                      = "private"
@@ -53,7 +53,7 @@ resource "aws_lambda_layer_version" "server_layer" {
 
 module "next_lambda" {
   source  = "terraform-aws-modules/lambda/aws"
-  version = "6.5.0"
+  version = "8.7.0"
 
   function_name = "${var.deployment_name}-ssr"
   description   = "${var.deployment_name} Server"
@@ -106,7 +106,7 @@ module "next_lambda" {
 
 module "api_gateway_cloudwatch_log_group" {
   source  = "terraform-aws-modules/cloudwatch/aws//modules/log-group"
-  version = "4.3.0"
+  version = "5.7.2"
 
   name              = "${var.deployment_name}-api-gateway-logs"
   retention_in_days = var.next_lambda_logs_retention
@@ -114,7 +114,7 @@ module "api_gateway_cloudwatch_log_group" {
 
 module "api_gateway" {
   source  = "terraform-aws-modules/apigateway-v2/aws"
-  version = "2.2.2"
+  version = "4.0.0"
 
   name        = "${var.deployment_name}-api"
   description = "${var.deployment_name} API"

@@ -36,7 +36,7 @@ module "next_cloudfront_certificate" {
   count = (var.deployment_domain != null) ? 1 : 0
 
   source  = "terraform-aws-modules/acm/aws"
-  version = "4.3.2"
+  version = "6.3.0"
 
   domain_name = (var.deployment_domain != null) ? var.deployment_domain : null
   zone_id     = (var.deployment_domain != null) ? data.aws_route53_zone.hosted_zone[0].zone_id : null
