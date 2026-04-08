@@ -4,7 +4,7 @@
 
 module "static_assets_bucket" {
   source  = "terraform-aws-modules/s3-bucket/aws"
-  version = "3.15.1"
+  version = "5.12.0"
 
   bucket                   = "${var.deployment_name}-static-assets"
   acl                      = "private"

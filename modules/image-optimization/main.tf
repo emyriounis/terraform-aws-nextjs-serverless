@@ -8,7 +8,7 @@ module "image_optimization" {
   }
 
   source  = "terraform-aws-modules/lambda/aws"
-  version = "6.5.0"
+  version = "8.7.0"
 
   function_name = "${var.deployment_name}-image-optimization"
   description   = "${var.deployment_name} Image Optimization"
@@ -55,7 +55,7 @@ module "image_redirection" {
   }
 
   source  = "terraform-aws-modules/lambda/aws"
-  version = "6.5.0"
+  version = "8.7.0"
 
   function_name = "${var.deployment_name}-ns-img-rdr"
   description   = "${var.deployment_name} Image Redirection"

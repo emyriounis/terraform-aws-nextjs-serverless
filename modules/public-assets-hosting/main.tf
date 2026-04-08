@@ -30,7 +30,7 @@ locals {
 
 module "public_assets_bucket" {
   source  = "terraform-aws-modules/s3-bucket/aws"
-  version = "3.15.1"
+  version = "5.12.0"
 
   bucket                   = "${var.deployment_name}-public-assets"
   acl                      = "private"
