@@ -15,7 +15,9 @@ variable "base_dir" {
 }
 
 variable "public_assets_bucket" {
-  type = map(any)
+  type = object({
+    s3_bucket_arn = string
+  })
 }
 
 variable "image_optimization_lambda_memory_size" {

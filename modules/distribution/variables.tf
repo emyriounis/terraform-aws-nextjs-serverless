@@ -36,7 +36,10 @@ variable "image_redirection_qualified_arn" {
 }
 
 variable "static_assets_bucket" {
-  type = map(any)
+  type = object({
+    s3_bucket_id                          = string
+    s3_bucket_bucket_regional_domain_name = string
+  })
 }
 
 variable "static_assets_origin_id" {
@@ -44,7 +47,10 @@ variable "static_assets_origin_id" {
 }
 
 variable "public_assets_bucket" {
-  type = map(any)
+  type = object({
+    s3_bucket_id                          = string
+    s3_bucket_bucket_regional_domain_name = string
+  })
 }
 
 variable "public_assets_bucket_region" {

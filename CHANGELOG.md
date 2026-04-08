@@ -6,6 +6,10 @@ All notable changes to this project will be documented in this file.
 <!--  -->
 <!-- ## [Unreleased] -->
 
+## [v3.1.1] - 2026-04-08
+
+- Bugfix: bump various terraform module versions
+
 ## [v3.1.0] - 2026-04-08
 
 - Bump various terraform module versions
