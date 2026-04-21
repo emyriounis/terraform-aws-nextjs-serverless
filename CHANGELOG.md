@@ -6,6 +6,10 @@ All notable changes to this project will be documented in this file.
 <!--  -->
 <!-- ## [Unreleased] -->
 
+## [v3.2.0] - 2026-04-21
+
+- Add `create_cloudfront_distribution` tf variable
+
 ## [v3.1.1] - 2026-04-08
 
 - Bugfix: bump various terraform module versions

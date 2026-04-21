@@ -166,6 +166,13 @@ variable "cloudfront_function_associations" {
   default = []
 }
 
+variable "create_cloudfront_distribution" {
+  description = "Boolean to disable the cloudfront distribution creation"
+  type        = bool
+  default     = true
+
+}
+
 variable "create_cloudfront_invalidation" {
   description = "Boolean to disable the trigger for cloudfront invalidation after every deployment"
   type        = bool
