@@ -19,11 +19,11 @@ output "server-side-rendering" {
 }
 
 output "distribution" {
-  value       = var.create_cloudfront_distribution ? module.distribution[0] : {}
+  value       = one(module.distribution[*])
   description = "Resources created by the distribution module"
 }
 
 output "cloudfront_url" {
-  value       = var.create_cloudfront_distribution ? module.distribution[0].next_distribution.domain_name : null
+  value       = try(one(module.distribution[*]).next_distribution.domain_name, null)
   description = "The URL where cloudfront hosts the distribution"
 }
