@@ -51,6 +51,8 @@ module "image-optimization" {
 }
 
 module "distribution" {
+  count = var.create_cloudfront_distribution ? 1 : 0
+
   source = "./modules/distribution"
 
   static_assets_bucket    = module.static-assets-hosting.static_assets_bucket
@@ -99,15 +101,15 @@ resource "null_resource" "delete_resized_versions" {
 
 # resize new public assets
 data "http" "resize_image_version" {
-  for_each   = var.pre_resize_images ? module.public-assets-hosting.all_resized_images_paths : {}
+  for_each   = var.create_cloudfront_distribution && var.pre_resize_images ? module.public-assets-hosting.all_resized_images_paths : {}
   depends_on = [null_resource.create_cloudfront_invalidation]
 
-  url = "https://${module.distribution.next_distribution.domain_name}/_next/image/${each.value}"
+  url = "https://${module.distribution[0].next_distribution.domain_name}/_next/image/${each.value}"
 }
 
 # trigger create-invalidation after every deployment
 resource "null_resource" "create_cloudfront_invalidation" {
-  count      = var.create_cloudfront_invalidation ? 1 : 0
+  count      = var.create_cloudfront_distribution && var.create_cloudfront_invalidation ? 1 : 0
   depends_on = [null_resource.delete_resized_versions]
 
   triggers = {
@@ -115,6 +117,6 @@ resource "null_resource" "create_cloudfront_invalidation" {
   }
 
   provisioner "local-exec" {
-    command = "aws cloudfront create-invalidation --distribution-id ${module.distribution.next_distribution.id} --paths '/*' "
+    command = "aws cloudfront create-invalidation --distribution-id ${module.distribution[0].next_distribution.id} --paths '/*' "
   }
 }
