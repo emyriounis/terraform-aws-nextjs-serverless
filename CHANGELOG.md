@@ -6,6 +6,10 @@ All notable changes to this project will be documented in this file.
 <!--  -->
 <!-- ## [Unreleased] -->
 
+## [v3.3.0] - 2026-10-27
+
+- Upgrade `sharp` to v0.35.5
+
 ## [v3.2.0] - 2026-04-21
 
 - Add `create_cloudfront_distribution` tf variable

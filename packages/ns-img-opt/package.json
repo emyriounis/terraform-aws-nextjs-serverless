@@ -1,6 +1,6 @@
 {
   "name": "ns-img-opt",
-  "version": "3.0.1",
+  "version": "3.3.0",
   "description": "Image Optimization Lambda",
   "main": "index.js",
   "scripts": {
@@ -15,7 +15,7 @@
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.433.0",
-    "sharp": "^0.32.6"
+    "sharp": "^0.35.5"
   },
   "files": [
     "source.zip"
